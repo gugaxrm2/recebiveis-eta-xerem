@@ -1,186 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Recebíveis - Consórcio ETA Xerém</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* ===== TODOS OS ESTILOS AQUI (use os mesmos de antes) ===== */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; padding-bottom: 40px; }
-        .container { max-width: 1100px; margin: auto; padding: 16px; }
-        #tela-login { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-        #tela-login.hidden { display: none; }
-        .login-box { background: white; border-radius: 20px; padding: 40px 30px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-        .login-box h2 { text-align: center; font-size: 22px; color: #1a1a2e; margin-bottom: 5px; }
-        .login-box .sub { text-align: center; font-size: 13px; color: #6c757d; margin-bottom: 25px; }
-        .login-box .form-group { margin-bottom: 16px; }
-        .login-box .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 5px; }
-        .login-box .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #ced4da; border-radius: 10px; font-size: 15px; background: #f8f9fa; }
-        .login-box .form-group input:focus { outline: none; border-color: #0d6efd; background: white; }
-        .login-box .btn-entrar { width: 100%; padding: 13px; background: #0d6efd; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background .2s; }
-        .login-box .btn-entrar:hover { background: #0b5ed7; }
-        .login-box .btn-entrar:disabled { opacity: .6; cursor: not-allowed; }
-        .login-box .erro-login { color: #dc3545; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
-        .login-box .sucesso-login { color: #198754; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
-        #sistema { display: none; }
-        #sistema.visible { display: block; }
-        header { text-align: center; padding: 20px 0 10px; }
-        header h1 { font-size: 23px; }
-        header p { font-size: 13px; color: #6c757d; margin-top: 5px; }
-        .header-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-        .connection { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 20px; font-size: 11px; background: #d4edda; color: #198754; font-weight: bold; }
-        .connection.offline { background: #f8d7da; color: #dc3545; }
-        .btn-sair { background: #dc3545; color: white; border: none; border-radius: 20px; padding: 5px 16px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn-sair:hover { background: #b02a37; }
-        .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
-        @media(min-width:700px){ .cards { grid-template-columns: repeat(5, 1fr); } }
-        .card { border-radius: 14px; padding: 15px 10px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        .card .label { font-size: 10px; opacity: .85; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
-        .card .value { font-size: 18px; font-weight: bold; }
-        .card .sub { font-size: 10px; opacity: .8; margin-top: 3px; }
-        .card-dark { background: #1a1a2e; }
-        .card-green { background: #198754; }
-        .card-red { background: #dc3545; }
-        .card-blue { background: #0d6efd; }
-        .card-orange { background: #fd7e14; }
-        .form-box { background: white; border-radius: 14px; padding: 16px; margin: 16px 0; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-        .form-box h3 { font-size: 14px; margin-bottom: 12px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        @media(min-width:700px){ .form-grid { grid-template-columns: 1fr 1.2fr 1.3fr 1fr auto; align-items: end; } }
-        .form-group label { display: block; font-size: 11px; color: #6c757d; margin-bottom: 4px; font-weight: 500; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; background: #f8f9fa; }
-        .btn-add { background: #0d6efd; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-cancel { background: #6c757d; color: white; border: none; border-radius: 10px; padding: 10px 15px; font-size: 13px; font-weight: bold; cursor: pointer; display: none; width: 100%; }
-        .error { color: #dc3545; font-size: 12px; margin-top: 8px; display: none; }
-        .success { color: #198754; font-size: 12px; margin-top: 8px; display: none; }
-        .table-wrap { background: white; border-radius: 14px; overflow-x: auto; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin: 16px 0; }
-        table { width: 100%; min-width: 850px; border-collapse: collapse; font-size: 13px; }
-        thead { background: #1a1a2e; color: white; }
-        th { padding: 12px 10px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
-        td { padding: 10px; border-bottom: 1px solid #e9ecef; text-align: center; }
-        td.valor, td.imposto { text-align: right; font-weight: bold; }
-        .status { border-radius: 8px; padding: 6px 10px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
-        .status-recebido { background: #198754; }
-        .status-pendente { background: #dc3545; }
-        .linha-recebido td { background: #d4edda; }
-        .linha-pendente td { background: #f8d7da; }
-        .acoes { display: flex; gap: 5px; justify-content: center; }
-        .btn-editar, .btn-excluir { border: none; border-radius: 7px; padding: 6px 9px; cursor: pointer; color: white; font-size: 12px; }
-        .btn-editar { background: #0d6efd; }
-        .btn-excluir { background: #dc3545; }
-        tfoot { background: #e9ecef; font-weight: bold; }
-        tfoot td { padding: 11px; }
-        .charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 16px 0; }
-        @media(min-width:700px){ .charts { grid-template-columns: 1fr 1fr; } }
-        .chart-box { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); text-align: center; }
-        .chart-box h4 { font-size: 13px; margin-bottom: 10px; }
-        canvas { max-width: 100%; height: auto; }
-        .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 16px 0; }
-        .btn-action { background: white; border: 1px solid #dee2e6; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; color: #1a1a2e; }
-        .btn-action:hover { background: #f8f9fa; }
-        @media(max-width:599px){ .cards { grid-template-columns: 1fr 1fr; } header h1 { font-size: 20px; } }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 15px; padding: 20px; }
-        .modal-content h3 { margin-bottom: 15px; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .modal-actions button { flex: 1; }
-    </style>
-</head>
-<body>
-
-<!-- TELA DE LOGIN -->
-<div id="tela-login">
-    <div class="login-box">
-        <h2>🔐 Acesso ao Sistema</h2>
-        <p class="sub">Consórcio ETA Xerém</p>
-        <div class="form-group">
-            <label for="login-email">E-mail</label>
-            <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
-        </div>
-        <div class="form-group">
-            <label for="login-senha">Senha</label>
-            <input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <button class="btn-entrar" id="btn-entrar" onclick="fazerLogin()">ENTRAR</button>
-        <div class="erro-login" id="login-erro"></div>
-        <div class="sucesso-login" id="login-sucesso"></div>
-    </div>
-</div>
-
-<!-- SISTEMA PRINCIPAL -->
-<div id="sistema">
-<div class="container">
-<header>
-    <h1>📊 CONTROLE DE RECEBÍVEIS</h1>
-    <p>CONSÓRCIO ETA XERÉM</p>
-    <div class="header-actions">
-        <div id="connection" class="connection">🟢 Banco conectado</div>
-        <button class="btn-sair" onclick="fazerLogout()">🚪 Sair</button>
-    </div>
-</header>
-
-<div class="cards">
-    <div class="card card-dark"><div class="label">Faturamento</div><div class="value" id="card-total">R$ 0,00</div><div class="sub" id="card-qtd">0 notas</div></div>
-    <div class="card card-green"><div class="label">Recebido</div><div class="value" id="card-rec">R$ 0,00</div><div class="sub" id="card-qtd-rec">0 notas</div></div>
-    <div class="card card-red"><div class="label">Pendente</div><div class="value" id="card-pen">R$ 0,00</div><div class="sub" id="card-qtd-pen">0 notas</div></div>
-    <div class="card card-orange"><div class="label">Imposto provável</div><div class="value" id="card-imposto">R$ 0,00</div><div class="sub">Estimativa 10%</div></div>
-    <div class="card card-blue"><div class="label">% Recebido</div><div class="value" id="card-pct">0%</div></div>
-</div>
-
-<div class="form-box">
-    <h3 id="titulo-form">➕ Adicionar Nova Nota Fiscal</h3>
-    <div class="form-grid">
-        <div class="form-group"><label>Nº da Nota</label><input type="number" id="in-nota" placeholder="Ex: 360"></div>
-        <div class="form-group"><label>Data de Emissão</label><input type="date" id="in-data"></div>
-        <div class="form-group"><label>Valor (R$)</label><input type="number" step="0.01" id="in-valor" placeholder="0,00"></div>
-        <div class="form-group"><label>Status</label><select id="in-status"><option value="Pendente">🔴 Pendente</option><option value="Recebido">🟢 Recebido</option></select></div>
-        <div class="form-group">
-            <button class="btn-add" id="btn-salvar" onclick="salvarNota()">ADICIONAR</button>
-            <button class="btn-cancel" id="btn-cancelar" onclick="cancelarEdicao()">CANCELAR</button>
-        </div>
-    </div>
-    <div class="error" id="msg-erro"></div>
-    <div class="success" id="msg-sucesso"></div>
-</div>
-
-<div class="table-wrap">
-    <table>
-        <thead><tr><th>#</th><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto Provável</th><th>Status</th><th>Ações</th></tr></thead>
-        <tbody id="tbody"></tbody>
-        <tfoot id="tfoot"></tfoot>
-    </table>
-</div>
-
-<div class="charts">
-    <div class="chart-box"><h4>Distribuição Financeira</h4><canvas id="chartPie" width="400" height="280"></canvas></div>
-    <div class="chart-box"><h4>Valores por Nota Fiscal</h4><canvas id="chartBar" width="500" height="280"></canvas></div>
-</div>
-
-<div class="actions">
-    <button class="btn-action" onclick="exportarCSV()">📄 Exportar CSV</button>
-    <button class="btn-action" onclick="exportarExcel()">📥 Exportar Excel</button>
-    <button class="btn-action" onclick="recarregar()">🔄 Atualizar</button>
-</div>
-
-<footer>Relatório online — Dados armazenados no Supabase</footer>
-</div>
-</div>
-
-<!-- MODAL EXCLUSÃO -->
-<div class="modal" id="modalExcluir">
-    <div class="modal-content">
-        <h3>🗑️ Excluir nota?</h3>
-        <p id="textoExcluir"></p>
-        <div class="modal-actions">
-            <button class="btn-action" onclick="fecharModal()">Cancelar</button>
-            <button class="btn-excluir" onclick="confirmarExclusao()">Excluir</button>
-        </div>
-    </div>
-</div>
-
-<script>
 // ================================================================
 // CONFIGURAÇÃO SUPABASE
 // ================================================================
@@ -193,7 +10,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 // AUTENTICAÇÃO
 // ================================================================
 
-// Torna as funções GLOBAIS para o HTML poder chamar
+// Torna as funções GLOBAIS para o HTML poder chamar (como fallback)
 window.fazerLogin = fazerLogin;
 window.fazerLogout = fazerLogout;
 window.verificarSessao = verificarSessao;
@@ -210,7 +27,7 @@ async function verificarSessao() {
             mostrarSistema(false);
         }
     } catch (err) {
-        console.error('❌ Erro:', err);
+        console.error('❌ Erro ao verificar sessão:', err);
         mostrarSistema(false);
     }
 }
@@ -221,13 +38,17 @@ function mostrarSistema(logado) {
     if (logado) {
         telaLogin.classList.add('hidden');
         sistema.classList.add('visible');
+        console.log('✅ Sistema visível');
     } else {
         telaLogin.classList.remove('hidden');
         sistema.classList.remove('visible');
+        console.log('🔒 Tela de login visível');
     }
 }
 
 async function fazerLogin() {
+    console.log('🔑 Função fazerLogin() chamada!');
+    
     const email = document.getElementById('login-email').value.trim();
     const senha = document.getElementById('login-senha').value;
     const btn = document.getElementById('btn-entrar');
@@ -258,13 +79,13 @@ async function fazerLogin() {
         if (error) {
             erroEl.textContent = '❌ ' + error.message;
             erroEl.style.display = 'block';
-            console.error('Erro de login:', error);
+            console.error('❌ Erro de login:', error);
             return;
         }
 
         if (data && data.session) {
             console.log('✅ Login OK! Usuário:', data.user.email);
-            sucessoEl.textContent = '✅ Login realizado!';
+            sucessoEl.textContent = '✅ Login realizado com sucesso!';
             sucessoEl.style.display = 'block';
             document.getElementById('login-email').value = '';
             document.getElementById('login-senha').value = '';
@@ -277,14 +98,46 @@ async function fazerLogin() {
         btn.textContent = 'ENTRAR';
         erroEl.textContent = '❌ ' + err.message;
         erroEl.style.display = 'block';
-        console.error('Erro:', err);
+        console.error('❌ Erro inesperado:', err);
     }
 }
 
 async function fazerLogout() {
-    await db.auth.signOut();
+    console.log('🚪 Fazendo logout...');
+    const { error } = await db.auth.signOut();
+    if (error) {
+        alert('Erro ao sair: ' + error.message);
+        return;
+    }
     mostrarSistema(false);
 }
+
+// ================================================================
+// INICIALIZAÇÃO E EVENTOS
+// ================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM carregado!');
+    
+    // Verifica sessão
+    verificarSessao();
+    
+    // Conecta o botão de login
+    const btnEntrar = document.getElementById('btn-entrar');
+    if (btnEntrar) {
+        console.log('✅ Botão ENTRAR conectado!');
+        btnEntrar.addEventListener('click', fazerLogin);
+    } else {
+        console.error('❌ Botão ENTRAR NÃO encontrado!');
+    }
+    
+    // Conecta o botão de logout
+    const btnSair = document.querySelector('.btn-sair');
+    if (btnSair) {
+        btnSair.addEventListener('click', fazerLogout);
+        console.log('✅ Botão SAIR conectado!');
+    }
+});
 
 // ================================================================
 // TODAS AS OUTRAS FUNÇÕES (CRUD, GRÁFICOS, EXPORTAÇÕES)
@@ -561,4 +414,46 @@ function desenharBar(labels, valores, cores) {
         const alturaBarra = valor / max * altura;
         const y = margem.top + altura - alturaBarra;
         ctx.fillStyle = cores[i];
-        ctx.fillRect(x, y, larg
+        ctx.fillRect(x, y, larguraBarra, alturaBarra);
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 8px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("R$ " + (valor / 1000).toFixed(1) + "k", x + larguraBarra / 2, Math.max(y - 5, 10));
+        ctx.save();
+        ctx.fillStyle = "#6c757d";
+        ctx.font = "9px sans-serif";
+        ctx.translate(x + larguraBarra / 2, h - margem.bottom + 12);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillText(labels[i], 0, 0);
+        ctx.restore();
+    });
+}
+
+function exportarCSV() {
+    let csv = "Nota,Emissao,Valor,Imposto,Status\n";
+    notas.forEach(n => {
+        csv += `${n.numero_nota},${dataBR(n.data_emissao)},${Number(n.valor).toFixed(2).replace(".", ",")},${imposto(n.valor).toFixed(2).replace(".", ",")},${n.status}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "recebiveis_eta_xerem.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function exportarExcel() {
+    let html = `<table border="1"><tr><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto</th><th>Status</th></tr>`;
+    notas.forEach(n => {
+        html += `<tr><td>${n.numero_nota}</td><td>${dataBR(n.data_emissao)}</td><td>${Number(n.valor).toFixed(2).replace(".", ",")}</td><td>${imposto(n.valor).toFixed(2).replace(".", ",")}</td><td>${n.status}</td></tr>`;
+    });
+    html += "</table>";
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "recebiveis_eta_xerem.xls";
+    a.click();
+    URL.revokeObjectURL(url);
+}
