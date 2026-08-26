@@ -180,65 +180,54 @@
 </div>
 
 <script>
-// ================================================================
 // CONFIGURAÇÃO SUPABASE
-// ================================================================
 const SUPABASE_URL = "https://iomskeqqgfgetaymheup.supabase.co";
 const SUPABASE_KEY = "sb_publishable_LwcQSXB9eLlkhoCRWGDTjg_W2Em1u8F";
 const { createClient } = window.supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ================================================================
-// AUTENTICAÇÃO - USANDO onclick (mais confiável)
-// ================================================================
+// VARIÁVEIS GLOBAIS
+let notas = [];
+let notaEditando = null;
+let notaExcluindo = null;
+let realtimeChannel = null;
+const IMPOSTO_PERCENTUAL = 0.10;
+
+// ===== FUNÇÕES DE AUTENTICAÇÃO =====
 
 async function verificarSessao() {
     try {
         const { data: { session } } = await db.auth.getSession();
-        console.log('🔍 Sessão:', session ? 'Ativa' : 'Nenhuma');
+        console.log('Sessão:', session ? 'Ativa' : 'Nenhuma');
         if (session) {
-            mostrarSistema(true);
+            document.getElementById('tela-login').classList.add('hidden');
+            document.getElementById('sistema').classList.add('visible');
             await carregarNotas();
             iniciarRealtime();
         } else {
-            mostrarSistema(false);
+            document.getElementById('tela-login').classList.remove('hidden');
+            document.getElementById('sistema').classList.remove('visible');
         }
     } catch (err) {
-        console.error('❌ Erro ao verificar sessão:', err);
-        mostrarSistema(false);
+        console.error('Erro:', err);
     }
 }
 
-function mostrarSistema(logado) {
-    const telaLogin = document.getElementById('tela-login');
-    const sistema = document.getElementById('sistema');
-    if (logado) {
-        telaLogin.classList.add('hidden');
-        sistema.classList.add('visible');
-        console.log('✅ Sistema visível');
-    } else {
-        telaLogin.classList.remove('hidden');
-        sistema.classList.remove('visible');
-        console.log('🔒 Tela de login visível');
-    }
-}
-
-// Função chamada pelo onclick do botão
 async function fazerLogin() {
-    console.log('🔑 Botão ENTRAR clicado!');
+    console.log('🔑 Login iniciado!');
     
     const email = document.getElementById('login-email').value.trim();
     const senha = document.getElementById('login-senha').value;
     const btn = document.getElementById('btn-entrar');
-    const erroEl = document.getElementById('login-erro');
-    const sucessoEl = document.getElementById('login-sucesso');
+    const erro = document.getElementById('login-erro');
+    const sucesso = document.getElementById('login-sucesso');
 
-    erroEl.style.display = 'none';
-    sucessoEl.style.display = 'none';
+    erro.style.display = 'none';
+    sucesso.style.display = 'none';
 
     if (!email || !senha) {
-        erroEl.textContent = 'Preencha e-mail e senha.';
-        erroEl.style.display = 'block';
+        erro.textContent = 'Preencha e-mail e senha.';
+        erro.style.display = 'block';
         return;
     }
 
@@ -255,72 +244,52 @@ async function fazerLogin() {
         btn.textContent = 'ENTRAR';
 
         if (error) {
-            erroEl.textContent = '❌ ' + error.message;
-            erroEl.style.display = 'block';
-            console.error('❌ Erro de login:', error);
+            erro.textContent = '❌ ' + error.message;
+            erro.style.display = 'block';
+            console.error('Erro:', error);
             return;
         }
 
         if (data && data.session) {
-            console.log('✅ Login OK! Usuário:', data.user.email);
-            sucessoEl.textContent = '✅ Login realizado com sucesso!';
-            sucessoEl.style.display = 'block';
+            console.log('✅ Login OK!');
+            sucesso.textContent = '✅ Login realizado!';
+            sucesso.style.display = 'block';
             document.getElementById('login-email').value = '';
             document.getElementById('login-senha').value = '';
-            mostrarSistema(true);
+            
+            document.getElementById('tela-login').classList.add('hidden');
+            document.getElementById('sistema').classList.add('visible');
+            
             await carregarNotas();
             iniciarRealtime();
         }
     } catch (err) {
         btn.disabled = false;
         btn.textContent = 'ENTRAR';
-        erroEl.textContent = '❌ ' + err.message;
-        erroEl.style.display = 'block';
-        console.error('❌ Erro inesperado:', err);
+        erro.textContent = '❌ ' + err.message;
+        erro.style.display = 'block';
+        console.error('Erro:', err);
     }
 }
 
 async function fazerLogout() {
-    console.log('🚪 Fazendo logout...');
-    const { error } = await db.auth.signOut();
-    if (error) {
-        alert('Erro ao sair: ' + error.message);
-        return;
-    }
-    mostrarSistema(false);
+    await db.auth.signOut();
+    document.getElementById('tela-login').classList.remove('hidden');
+    document.getElementById('sistema').classList.remove('visible');
 }
 
-// ================================================================
-// INICIALIZAÇÃO
-// ================================================================
-
-// Verifica sessão ao carregar a página
-verificarSessao();
-
-// ================================================================
-// TODAS AS OUTRAS FUNÇÕES (CRUD, GRÁFICOS, EXPORTAÇÕES)
-// ================================================================
-
-const IMPOSTO_PERCENTUAL = 0.10;
-let notas = [];
-let notaEditando = null;
-let notaExcluindo = null;
-let realtimeChannel = null;
+// ===== FUNÇÕES DE UTILIDADE =====
 
 function moeda(v) { return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
 function imposto(v) { return Math.round(Number(v || 0) * IMPOSTO_PERCENTUAL * 100) / 100; }
-function dataBR(d) { if (!d) return ""; const p = d.split("-"); return `${p[2]}/${p[1]}/${p[0]}`; }
+function dataBR(d) { if (!d) return ""; const p = d.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
 function escapar(t) { return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
 
+// ===== CRUD =====
+
 async function carregarNotas() {
-    mostrarConexao(true);
     const { data, error } = await db.from("notas").select("*").order("data_emissao", { ascending: true });
-    if (error) {
-        console.error(error);
-        mostrarConexao(false);
-        mostrarErro("Erro: " + error.message);
-        return;
-    }
+    if (error) { console.error(error); return; }
     notas = data || [];
     renderizar();
 }
@@ -335,8 +304,7 @@ function renderizar() {
     notas.forEach((n, i) => {
         const v = Number(n.valor);
         const imp = imposto(v);
-        total += v;
-        impTotal += imp;
+        total += v; impTotal += imp;
         if (n.status === "Recebido") { recebido += v; qtdRec++; } else { pendente += v; qtdPen++; }
         labels.push(String(n.numero_nota));
         valores.push(v);
@@ -381,32 +349,23 @@ function renderizar() {
 }
 
 async function salvarNota() {
-    limparMensagens();
     const numero = parseInt(document.getElementById("in-nota").value);
     const data = document.getElementById("in-data").value;
     const valor = parseFloat(document.getElementById("in-valor").value);
     const status = document.getElementById("in-status").value;
 
-    if (!numero || !data || !valor || valor <= 0) {
-        mostrarErro("Preencha todos os campos.");
-        return;
-    }
+    if (!numero || !data || !valor || valor <= 0) { alert("Preencha todos os campos."); return; }
 
     if (notaEditando) {
-        const { error } = await db.from("notas").update({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status }).eq("id", notaEditando);
-        if (error) { mostrarErro("Erro: " + error.message); return; }
-        mostrarSucesso("Atualizada!");
+        await db.from("notas").update({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status }).eq("id", notaEditando);
         cancelarEdicao();
         return;
     }
 
-    const existente = notas.find(n => Number(n.numero_nota) === numero);
-    if (existente) { mostrarErro("Nota já existe!"); return; }
+    if (notas.find(n => Number(n.numero_nota) === numero)) { alert("Nota já existe!"); return; }
 
-    const { error } = await db.from("notas").insert({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status });
-    if (error) { mostrarErro("Erro: " + error.message); return; }
+    await db.from("notas").insert({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status });
     limparFormulario();
-    mostrarSucesso("Adicionada!");
 }
 
 function editarNota(id) {
@@ -420,7 +379,6 @@ function editarNota(id) {
     document.getElementById("in-status").value = nota.status;
     document.getElementById("btn-salvar").textContent = "SALVAR";
     document.getElementById("btn-cancelar").style.display = "block";
-    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function cancelarEdicao() {
@@ -439,14 +397,11 @@ function abrirExclusao(id) {
     const nota = notas.find(n => String(n.id) === String(id));
     if (!nota) return;
     notaExcluindo = id;
-    document.getElementById("textoExcluir").textContent = `Excluir NF ${nota.numero_nota} - ${moeda(nota.valor)}?`;
+    document.getElementById("textoExcluir").textContent = "Excluir NF " + nota.numero_nota + " - " + moeda(nota.valor) + "?";
     document.getElementById("modalExcluir").style.display = "flex";
 }
 
-function fecharModal() {
-    notaExcluindo = null;
-    document.getElementById("modalExcluir").style.display = "none";
-}
+function fecharModal() { notaExcluindo = null; document.getElementById("modalExcluir").style.display = "none"; }
 
 async function confirmarExclusao() {
     if (!notaExcluindo) return;
@@ -459,35 +414,6 @@ function limparFormulario() {
     document.getElementById("in-data").value = "";
     document.getElementById("in-valor").value = "";
     document.getElementById("in-status").value = "Pendente";
-}
-
-function limparMensagens() {
-    document.getElementById("msg-erro").style.display = "none";
-    document.getElementById("msg-sucesso").style.display = "none";
-}
-
-function mostrarErro(msg) {
-    const el = document.getElementById("msg-erro");
-    el.textContent = msg;
-    el.style.display = "block";
-}
-
-function mostrarSucesso(msg) {
-    const el = document.getElementById("msg-sucesso");
-    el.textContent = msg;
-    el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 3000);
-}
-
-function mostrarConexao(online) {
-    const el = document.getElementById("connection");
-    if (online) {
-        el.textContent = "🟢 Banco conectado";
-        el.classList.remove("offline");
-    } else {
-        el.textContent = "🔴 Erro de conexão";
-        el.classList.add("offline");
-    }
 }
 
 function iniciarRealtime() {
@@ -505,38 +431,23 @@ function desenharPie(recebido, pendente) {
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
     const total = recebido + pendente;
-    if (!total) {
-        ctx.fillStyle = "#6c757d";
-        ctx.font = "14px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Sem dados", w/2, h/2);
-        return;
-    }
+    if (!total) { ctx.fillStyle = "#6c757d"; ctx.font = "14px sans-serif"; ctx.textAlign = "center"; ctx.fillText("Sem dados", w/2, h/2); return; }
     const cx = w/2, cy = h/2 - 15, r = Math.min(w,h)/2 - 55;
     let inicio = -Math.PI/2;
     const fatias = [{ valor: recebido, cor: "#198754", nome: "Recebido" }, { valor: pendente, cor: "#dc3545", nome: "Pendente" }];
     fatias.forEach(f => {
         if (f.valor <= 0) return;
         const angulo = f.valor/total * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, r, inicio, inicio + angulo);
-        ctx.closePath();
-        ctx.fillStyle = f.cor;
-        ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, inicio, inicio + angulo); ctx.closePath();
+        ctx.fillStyle = f.cor; ctx.fill();
+        ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.stroke();
         inicio += angulo;
     });
     let y = h - 28;
     fatias.forEach(f => {
-        ctx.fillStyle = f.cor;
-        ctx.fillRect(w/2 - 90, y, 12, 12);
-        ctx.fillStyle = "#333";
-        ctx.font = "11px sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText(`${f.nome}: ${moeda(f.valor)}`, w/2 - 72, y + 10);
+        ctx.fillStyle = f.cor; ctx.fillRect(w/2 - 90, y, 12, 12);
+        ctx.fillStyle = "#333"; ctx.font = "11px sans-serif"; ctx.textAlign = "left";
+        ctx.fillText(f.nome + ": " + moeda(f.valor), w/2 - 72, y + 10);
         y += 18;
     });
 }
@@ -552,4 +463,37 @@ function desenharBar(labels, valores, cores) {
     const altura = h - margem.top - margem.bottom;
     const max = Math.max(...valores, 1);
     const espaco = largura / valores.length;
-    const larguraBarra = espaco
+    const larguraBarra = espaco * .65;
+
+    for (let i = 0; i <= 5; i++) {
+        const y = margem.top + altura - altura * i / 5;
+        ctx.beginPath(); ctx.moveTo(margem.left, y); ctx.lineTo(w - margem.right, y);
+        ctx.strokeStyle = "#dee2e6"; ctx.stroke();
+        ctx.fillStyle = "#6c757d"; ctx.font = "9px sans-serif"; ctx.textAlign = "right";
+        ctx.fillText("R$ " + (max * i / 5 / 1000).toFixed(0) + "k", margem.left - 5, y);
+    }
+
+    valores.forEach((valor, i) => {
+        const x = margem.left + i * espaco + (espaco - larguraBarra) / 2;
+        const alturaBarra = valor / max * altura;
+        const y = margem.top + altura - alturaBarra;
+        ctx.fillStyle = cores[i]; ctx.fillRect(x, y, larguraBarra, alturaBarra);
+        ctx.fillStyle = "#333"; ctx.font = "bold 8px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("R$ " + (valor / 1000).toFixed(1) + "k", x + larguraBarra / 2, Math.max(y - 5, 10));
+        ctx.save(); ctx.fillStyle = "#6c757d"; ctx.font = "9px sans-serif";
+        ctx.translate(x + larguraBarra / 2, h - margem.bottom + 12); ctx.rotate(-Math.PI / 4);
+        ctx.fillText(labels[i], 0, 0); ctx.restore();
+    });
+}
+
+function exportarCSV() {
+    let csv = "Nota,Emissao,Valor,Imposto,Status\n";
+    notas.forEach(n => { csv += n.numero_nota + "," + dataBR(n.data_emissao) + "," + Number(n.valor).toFixed(2).replace(".", ",") + "," + imposto(n.valor).toFixed(2).replace(".", ",") + "," + n.status + "\n"; });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = "recebiveis_eta_xerem.csv"; a.click(); URL.revokeObjectURL(url);
+}
+
+function exportarExcel() {
+    let html = "<table border='1'><tr><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto</th><th>Status</th></tr>";
+    notas.forEach(n => { html += "<tr><td>" + n.numero_nota + "</td><td>" + dataBR(n.data_emissao) + "</td><td>" + Number(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + imposto(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + n.status + "</td
