@@ -36,11 +36,117 @@ body {
     padding: 16px;
 }
 
+/* ================= LOGIN ================= */
+
+#tela-login {
+    position: fixed;
+    inset: 0;
+    background: #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+#tela-login.hidden {
+    display: none;
+}
+
+.login-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.login-box h2 {
+    text-align: center;
+    font-size: 22px;
+    color: #1a1a2e;
+    margin-bottom: 5px;
+}
+
+.login-box .sub {
+    text-align: center;
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+.login-box .form-group {
+    margin-bottom: 16px;
+}
+
+.login-box .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.login-box .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #f8f9fa;
+}
+
+.login-box .form-group input:focus {
+    outline: none;
+    border-color: #0d6efd;
+    background: white;
+}
+
+.login-box .btn-entrar {
+    width: 100%;
+    padding: 13px;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.login-box .btn-entrar:hover {
+    background: #0b5ed7;
+}
+
+.login-box .btn-entrar:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.login-box .erro-login {
+    color: #dc3545;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    display: none;
+}
+
+.login-box .sucesso-login {
+    color: #198754;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    display: none;
+}
+
 /* ================= HEADER ================= */
 
 header {
     text-align: center;
     padding: 20px 0 10px;
+    position: relative;
 }
 
 header h1 {
@@ -53,11 +159,19 @@ header p {
     margin-top: 5px;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
 .connection {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 8px;
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 11px;
@@ -69,6 +183,22 @@ header p {
 .connection.offline {
     background: #f8d7da;
     color: #dc3545;
+}
+
+.btn-sair {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.btn-sair:hover {
+    background: #b02a37;
 }
 
 /* ================= CARDS ================= */
@@ -423,10 +553,78 @@ canvas {
     flex: 1;
 }
 
+/* ================= SISTEMA (oculto quando não logado) ================= */
+
+#sistema {
+    display: none;
+}
+
+#sistema.visible {
+    display: block;
+}
+
 </style>
 </head>
 
 <body>
+
+<!-- ================= TELA DE LOGIN ================= -->
+
+<div id="tela-login">
+
+    <div class="login-box">
+
+        <h2>🔐 Acesso ao Sistema</h2>
+
+        <p class="sub">
+            Consórcio ETA Xerém
+        </p>
+
+        <div class="form-group">
+
+            <label for="login-email">E-mail</label>
+
+            <input
+            type="email"
+            id="login-email"
+            placeholder="seu@email.com"
+            autocomplete="email">
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="login-senha">Senha</label>
+
+            <input
+            type="password"
+            id="login-senha"
+            placeholder="••••••••"
+            autocomplete="current-password">
+
+        </div>
+
+        <button
+        class="btn-entrar"
+        id="btn-entrar"
+        onclick="fazerLogin()">
+
+        ENTRAR
+
+        </button>
+
+        <div class="erro-login" id="login-erro"></div>
+
+        <div class="sucesso-login" id="login-sucesso"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= SISTEMA PRINCIPAL ================= -->
+
+<div id="sistema">
 
 <div class="container">
 
@@ -438,8 +636,16 @@ canvas {
 CONSÓRCIO ETA XERÉM
 </p>
 
-<div id="connection" class="connection">
-    🟢 Banco conectado
+<div class="header-actions">
+
+    <div id="connection" class="connection">
+        🟢 Banco conectado
+    </div>
+
+    <button class="btn-sair" onclick="fazerLogout()">
+        🚪 Sair
+    </button>
+
 </div>
 
 </header>
@@ -742,6 +948,8 @@ Relatório online — Dados armazenados no Supabase
 
 </div>
 
+</div>
+
 
 <!-- ================= MODAL EXCLUSÃO ================= -->
 
@@ -804,6 +1012,95 @@ const db = createClient(
 
 
 /* ============================================================
+   AUTENTICAÇÃO
+============================================================ */
+
+async function verificarSessao() {
+    const { data: { session } } = await db.auth.getSession();
+
+    if (session) {
+        mostrarSistema(true);
+    } else {
+        mostrarSistema(false);
+    }
+}
+
+function mostrarSistema(logado) {
+    const telaLogin = document.getElementById('tela-login');
+    const sistema = document.getElementById('sistema');
+
+    if (logado) {
+        telaLogin.classList.add('hidden');
+        sistema.classList.add('visible');
+        carregarNotas();
+        iniciarRealtime();
+    } else {
+        telaLogin.classList.remove('hidden');
+        sistema.classList.remove('visible');
+    }
+}
+
+async function fazerLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const senha = document.getElementById('login-senha').value;
+    const btn = document.getElementById('btn-entrar');
+    const erroEl = document.getElementById('login-erro');
+    const sucessoEl = document.getElementById('login-sucesso');
+
+    erroEl.style.display = 'none';
+    sucessoEl.style.display = 'none';
+
+    if (!email || !senha) {
+        erroEl.textContent = 'Preencha e-mail e senha.';
+        erroEl.style.display = 'block';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Entrando...';
+
+    const { data, error } = await db.auth.signInWithPassword({
+        email: email,
+        password: senha
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'ENTRAR';
+
+    if (error) {
+        erroEl.textContent = '❌ ' + error.message;
+        erroEl.style.display = 'block';
+        return;
+    }
+
+    if (data.session) {
+        sucessoEl.textContent = '✅ Login realizado com sucesso!';
+        sucessoEl.style.display = 'block';
+
+        // Limpa os campos
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-senha').value = '';
+
+        // Aguarda 1s e mostra o sistema
+        setTimeout(() => {
+            mostrarSistema(true);
+        }, 1000);
+    }
+}
+
+async function fazerLogout() {
+    const { error } = await db.auth.signOut();
+
+    if (error) {
+        alert('Erro ao sair: ' + error.message);
+        return;
+    }
+
+    mostrarSistema(false);
+}
+
+
+/* ============================================================
    CONFIGURAÇÕES
 ============================================================ */
 
@@ -814,6 +1111,8 @@ let notas = [];
 let notaEditando = null;
 
 let notaExcluindo = null;
+
+let realtimeChannel = null;
 
 
 /* ============================================================
@@ -1648,719 +1947,4 @@ function limparFormulario() {
 
 function limparMensagens() {
 
-    document.getElementById(
-        "msg-erro"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "msg-sucesso"
-    ).style.display = "none";
-
-}
-
-
-function mostrarErro(msg) {
-
-    const el =
-        document.getElementById(
-            "msg-erro"
-        );
-
-    el.textContent = msg;
-
-    el.style.display = "block";
-
-}
-
-
-function mostrarSucesso(msg) {
-
-    const el =
-        document.getElementById(
-            "msg-sucesso"
-        );
-
-    el.textContent = msg;
-
-    el.style.display = "block";
-
-
-    setTimeout(() => {
-
-        el.style.display = "none";
-
-    }, 3000);
-
-}
-
-
-/* ============================================================
-   CONEXÃO
-============================================================ */
-
-function mostrarConexao(online) {
-
-    const el =
-        document.getElementById(
-            "connection"
-        );
-
-
-    if (online) {
-
-        el.textContent =
-            "🟢 Banco conectado";
-
-        el.classList.remove(
-            "offline"
-        );
-
-    } else {
-
-        el.textContent =
-            "🔴 Erro de conexão";
-
-        el.classList.add(
-            "offline"
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   REALTIME
-============================================================ */
-
-function iniciarRealtime() {
-
-    db
-        .channel(
-            "notas-realtime"
-        )
-
-        .on(
-
-            "postgres_changes",
-
-            {
-                event: "*",
-                schema: "public",
-                table: "notas"
-            },
-
-            payload => {
-
-                console.log(
-                    "Alteração recebida:",
-                    payload.eventType
-                );
-
-
-                carregarNotas();
-
-            }
-
-        )
-
-        .subscribe(
-            status => {
-
-                console.log(
-                    "Realtime:",
-                    status
-                );
-
-            }
-        );
-
-}
-
-
-/* ============================================================
-   ATUALIZAR MANUALMENTE
-============================================================ */
-
-function recarregar() {
-
-    carregarNotas();
-
-}
-
-
-/* ============================================================
-   GRÁFICO PIZZA
-============================================================ */
-
-function desenharPie(
-    recebido,
-    pendente
-) {
-
-    const canvas =
-        document.getElementById(
-            "chartPie"
-        );
-
-    const ctx =
-        canvas.getContext("2d");
-
-
-    const w = canvas.width;
-    const h = canvas.height;
-
-
-    ctx.clearRect(
-        0,
-        0,
-        w,
-        h
-    );
-
-
-    const total =
-        recebido + pendente;
-
-
-    if (!total) {
-
-        ctx.fillStyle = "#6c757d";
-
-        ctx.font =
-            "14px sans-serif";
-
-        ctx.textAlign = "center";
-
-        ctx.fillText(
-            "Sem dados",
-            w / 2,
-            h / 2
-        );
-
-        return;
-    }
-
-
-    const cx = w / 2;
-    const cy = h / 2 - 15;
-
-    const r =
-        Math.min(w, h) / 2 - 55;
-
-
-    let inicio =
-        -Math.PI / 2;
-
-
-    const fatias = [
-
-        {
-            valor: recebido,
-            cor: "#198754",
-            nome: "Recebido"
-        },
-
-        {
-            valor: pendente,
-            cor: "#dc3545",
-            nome: "Pendente"
-        }
-
-    ];
-
-
-    fatias.forEach(
-        fatia => {
-
-            if (fatia.valor <= 0)
-                return;
-
-
-            const angulo =
-                fatia.valor /
-                total *
-                Math.PI *
-                2;
-
-
-            ctx.beginPath();
-
-            ctx.moveTo(
-                cx,
-                cy
-            );
-
-            ctx.arc(
-                cx,
-                cy,
-                r,
-                inicio,
-                inicio + angulo
-            );
-
-            ctx.closePath();
-
-            ctx.fillStyle =
-                fatia.cor;
-
-            ctx.fill();
-
-
-            ctx.strokeStyle =
-                "#fff";
-
-            ctx.lineWidth = 3;
-
-            ctx.stroke();
-
-
-            inicio += angulo;
-
-        }
-    );
-
-
-    /* LEGENDA */
-
-    let y = h - 28;
-
-
-    fatias.forEach(
-        fatia => {
-
-            ctx.fillStyle =
-                fatia.cor;
-
-            ctx.fillRect(
-                w / 2 - 90,
-                y,
-                12,
-                12
-            );
-
-
-            ctx.fillStyle =
-                "#333";
-
-            ctx.font =
-                "11px sans-serif";
-
-            ctx.textAlign =
-                "left";
-
-            ctx.fillText(
-                `${fatia.nome}: ${moeda(fatia.valor)}`,
-                w / 2 - 72,
-                y + 10
-            );
-
-
-            y += 18;
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   GRÁFICO BARRAS
-============================================================ */
-
-function desenharBar(
-    labels,
-    valores,
-    cores
-) {
-
-    const canvas =
-        document.getElementById(
-            "chartBar"
-        );
-
-    const ctx =
-        canvas.getContext("2d");
-
-
-    const w = canvas.width;
-    const h = canvas.height;
-
-
-    ctx.clearRect(
-        0,
-        0,
-        w,
-        h
-    );
-
-
-    if (!valores.length)
-        return;
-
-
-    const margem = {
-
-        top: 25,
-        right: 10,
-        bottom: 60,
-        left: 55
-
-    };
-
-
-    const largura =
-        w -
-        margem.left -
-        margem.right;
-
-
-    const altura =
-        h -
-        margem.top -
-        margem.bottom;
-
-
-    const max =
-        Math.max(
-            ...valores,
-            1
-        );
-
-
-    const espaco =
-        largura /
-        valores.length;
-
-
-    const larguraBarra =
-        espaco * .65;
-
-
-    /* EIXO */
-
-    ctx.strokeStyle =
-        "#dee2e6";
-
-    ctx.lineWidth = 1;
-
-
-    for (
-        let i = 0;
-        i <= 5;
-        i++
-    ) {
-
-        const y =
-            margem.top +
-            altura -
-            altura * i / 5;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            margem.left,
-            y
-        );
-
-        ctx.lineTo(
-            w - margem.right,
-            y
-        );
-
-        ctx.stroke();
-
-
-        ctx.fillStyle =
-            "#6c757d";
-
-        ctx.font =
-            "9px sans-serif";
-
-        ctx.textAlign =
-            "right";
-
-        ctx.fillText(
-            "R$ " +
-            (
-                max *
-                i /
-                5 /
-                1000
-            ).toFixed(0) +
-            "k",
-            margem.left - 5,
-            y
-        );
-
-    }
-
-
-    /* BARRAS */
-
-    valores.forEach(
-        (valor, i) => {
-
-            const x =
-                margem.left +
-                i * espaco +
-                (espaco - larguraBarra) / 2;
-
-
-            const alturaBarra =
-                valor /
-                max *
-                altura;
-
-
-            const y =
-                margem.top +
-                altura -
-                alturaBarra;
-
-
-            ctx.fillStyle =
-                cores[i];
-
-            ctx.fillRect(
-                x,
-                y,
-                larguraBarra,
-                alturaBarra
-            );
-
-
-            /* VALOR */
-
-            ctx.fillStyle =
-                "#333";
-
-            ctx.font =
-                "bold 8px sans-serif";
-
-            ctx.textAlign =
-                "center";
-
-
-            ctx.fillText(
-                "R$ " +
-                (
-                    valor / 1000
-                ).toFixed(1) +
-                "k",
-                x + larguraBarra / 2,
-                Math.max(
-                    y - 5,
-                    10
-                )
-            );
-
-
-            /* NOTA */
-
-            ctx.save();
-
-            ctx.fillStyle =
-                "#6c757d";
-
-            ctx.font =
-                "9px sans-serif";
-
-            ctx.translate(
-                x + larguraBarra / 2,
-                h - margem.bottom + 12
-            );
-
-            ctx.rotate(
-                -Math.PI / 4
-            );
-
-            ctx.fillText(
-                labels[i],
-                0,
-                0
-            );
-
-            ctx.restore();
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   EXPORTAR CSV
-============================================================ */
-
-function exportarCSV() {
-
-    let csv =
-        "Nota,Emissao,Valor,Imposto Provavel,Status\n";
-
-
-    notas.forEach(
-        n => {
-
-            csv +=
-                `${n.numero_nota},` +
-                `${dataBR(n.data_emissao)},` +
-                `${Number(n.valor).toFixed(2).replace(".", ",")},` +
-                `${imposto(n.valor).toFixed(2).replace(".", ",")},` +
-                `${n.status}\n`;
-
-        }
-    );
-
-
-    const blob =
-        new Blob(
-            [csv],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(blob);
-
-
-    const a =
-        document.createElement("a");
-
-
-    a.href = url;
-
-    a.download =
-        "recebiveis_eta_xerem.csv";
-
-
-    a.click();
-
-
-    URL.revokeObjectURL(url);
-
-}
-
-
-/* ============================================================
-   EXPORTAR EXCEL
-============================================================ */
-
-function exportarExcel() {
-
-    let html = `
-
-<table border="1">
-
-<tr>
-
-<th>Nota</th>
-<th>Emissão</th>
-<th>Valor</th>
-<th>Imposto Provável</th>
-<th>Status</th>
-
-</tr>
-
-`;
-
-
-    notas.forEach(
-        n => {
-
-            html += `
-
-<tr>
-
-<td>
-${n.numero_nota}
-</td>
-
-<td>
-${dataBR(n.data_emissao)}
-</td>
-
-<td>
-${Number(n.valor)
-    .toFixed(2)
-    .replace(".", ",")}
-</td>
-
-<td>
-${imposto(n.valor)
-    .toFixed(2)
-    .replace(".", ",")}
-</td>
-
-<td>
-${n.status}
-</td>
-
-</tr>
-
-`;
-
-        }
-    );
-
-
-    html +=
-        "</table>";
-
-
-    const blob =
-        new Blob(
-            [html],
-            {
-                type:
-                    "application/vnd.ms-excel"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(blob);
-
-
-    const a =
-        document.createElement("a");
-
-
-    a.href = url;
-
-    a.download =
-        "recebiveis_eta_xerem.xls";
-
-
-    a.click();
-
-
-    URL.revokeObjectURL(url);
-
-}
-
-
-/* ============================================================
-   INICIALIZAÇÃO
-============================================================ */
-
-window.addEventListener(
-    "load",
-    async () => {
-
-        await carregarNotas();
-
-        iniciarRealtime();
-
-    }
-);
-
-</script>
-
-</body>
-</html>
+    document
