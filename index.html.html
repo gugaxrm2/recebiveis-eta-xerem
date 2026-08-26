@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Controle de Recebíveis - Consórcio ETA Xerém</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+
+    background: #f0f2f5;
+    color: #1a1a2e;
+    padding-bottom: 40px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 16px;
+}
+
+/* ================= HEADER ================= */
+
+header {
+    text-align: center;
+    padding: 20px 0 10px;
+}
+
+header h1 {
+    font-size: 23px;
+}
+
+header p {
+    font-size: 13px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.connection {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    background: #d4edda;
+    color: #198754;
+    font-weight: bold;
+}
+
+.connection.offline {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+/* ================= CARDS ================= */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 16px 0;
+}
+
+@media(min-width: 700px) {
+    .cards {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.card {
+    border-radius: 14px;
+    padding: 15px 10px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.card .label {
+    font-size: 10px;
+    opacity: .85;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.card .value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card .sub {
+    font-size: 10px;
+    opacity: .8;
+    margin-top: 3px;
+}
+
+.card-dark { background: #1a1a2e; }
+.card-green { background: #198754; }
+.card-red { background: #dc3545; }
+.card-blue { background: #0d6efd; }
+.card-orange { background: #fd7e14; }
+
+/* ================= FORM ================= */
+
+.form-box {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin: 16px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.form-box h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+@media(min-width: 700px) {
+    .form-grid {
+        grid-template-columns:
+            1fr
+            1.2fr
+            1.3fr
+            1fr
+            auto;
+        align-items: end;
+    }
+}
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    color: #6c757d;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #f8f9fa;
+}
+
+.btn-add {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    width: 100%;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+}
+
+.success {
+    color: #198754;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+    background: white;
+    border-radius: 14px;
+    overflow-x: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    margin: 16px 0;
+}
+
+table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+thead {
+    background: #1a1a2e;
+    color: white;
+}
+
+th {
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+}
+
+td.valor,
+td.imposto {
+    text-align: right;
+    font-weight: bold;
+}
+
+/* ================= STATUS ================= */
+
+.status {
+    border-radius: 8px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.status-recebido {
+    background: #198754;
+}
+
+.status-pendente {
+    background: #dc3545;
+}
+
+.linha-recebido td {
+    background: #d4edda;
+}
+
+.linha-pendente td {
+    background: #f8d7da;
+}
+
+/* ================= AÇÕES ================= */
+
+.acoes {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-editar,
+.btn-excluir {
+    border: none;
+    border-radius: 7px;
+    padding: 6px 9px;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+}
+
+.btn-editar {
+    background: #0d6efd;
+}
+
+.btn-excluir {
+    background: #dc3545;
+}
+
+/* ================= FOOTER TABLE ================= */
+
+tfoot {
+    background: #e9ecef;
+    font-weight: bold;
+}
+
+tfoot td {
+    padding: 11px;
+}
+
+/* ================= CHARTS ================= */
+
+.charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+@media(min-width: 700px) {
+    .charts {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.chart-box {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    text-align: center;
+}
+
+.chart-box h4 {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ================= ACTIONS ================= */
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.btn-action {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #1a1a2e;
+}
+
+.btn-action:hover {
+    background: #f8f9fa;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width: 599px) {
+
+    .cards {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    header h1 {
+        font-size: 20px;
+    }
+
+}
+
+/* ================= MODAL ================= */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-actions button {
+    flex: 1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<h1>📊 CONTROLE DE RECEBÍVEIS</h1>
+
+<p>
+CONSÓRCIO ETA XERÉM
+</p>
+
+<div id="connection" class="connection">
+    🟢 Banco conectado
+</div>
+
+</header>
+
+
+<!-- ================= CARDS ================= -->
+
+<div class="cards">
+
+<div class="card card-dark">
+
+<div class="label">
+Faturamento
+</div>
+
+<div class="value" id="card-total">
+R$ 0,00
+</div>
+
+<div class="sub" id="card-qtd">
+0 notas
+</div>
+
+</div>
+
+
+<div class="card card-green">
+
+<div class="label">
+Recebido
+</div>
+
+<div class="value" id="card-rec">
+R$ 0,00
+</div>
+
+<div class="sub" id="card-qtd-rec">
+0 notas
+</div>
+
+</div>
+
+
+<div class="card card-red">
+
+<div class="label">
+Pendente
+</div>
+
+<div class="value" id="card-pen">
+R$ 0,00
+</div>
+
+<div class="sub" id="card-qtd-pen">
+0 notas
+</div>
+
+</div>
+
+
+<div class="card card-orange">
+
+<div class="label">
+Imposto provável
+</div>
+
+<div class="value" id="card-imposto">
+R$ 0,00
+</div>
+
+<div class="sub">
+Estimativa 10%
+</div>
+
+</div>
+
+
+<div class="card card-blue">
+
+<div class="label">
+% Recebido
+</div>
+
+<div class="value" id="card-pct">
+0%
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================= FORM ================= -->
+
+<div class="form-box">
+
+<h3 id="titulo-form">
+➕ Adicionar Nova Nota Fiscal
+</h3>
+
+<div class="form-grid">
+
+<div class="form-group">
+
+<label>
+Nº da Nota
+</label>
+
+<input
+type="number"
+id="in-nota"
+placeholder="Ex: 360">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Data de Emissão
+</label>
+
+<input
+type="date"
+id="in-data">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Valor (R$)
+</label>
+
+<input
+type="number"
+step="0.01"
+id="in-valor"
+placeholder="0,00">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Status
+</label>
+
+<select id="in-status">
+
+<option value="Pendente">
+🔴 Pendente
+</option>
+
+<option value="Recebido">
+🟢 Recebido
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<button
+class="btn-add"
+id="btn-salvar"
+onclick="salvarNota()">
+
+ADICIONAR
+
+</button>
+
+<button
+class="btn-cancel"
+id="btn-cancelar"
+onclick="cancelarEdicao()">
+
+CANCELAR
+
+</button>
+
+</div>
+
+</div>
+
+<div class="error" id="msg-erro"></div>
+
+<div class="success" id="msg-sucesso"></div>
+
+</div>
+
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>#</th>
+<th>Nota</th>
+<th>Emissão</th>
+<th>Valor</th>
+<th>Imposto Provável</th>
+<th>Status</th>
+<th>Ações</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tbody"></tbody>
+
+<tfoot id="tfoot"></tfoot>
+
+</table>
+
+</div>
+
+
+<!-- ================= CHARTS ================= -->
+
+<div class="charts">
+
+<div class="chart-box">
+
+<h4>
+Distribuição Financeira
+</h4>
+
+<canvas
+id="chartPie"
+width="400"
+height="280">
+</canvas>
+
+</div>
+
+
+<div class="chart-box">
+
+<h4>
+Valores por Nota Fiscal
+</h4>
+
+<canvas
+id="chartBar"
+width="500"
+height="280">
+</canvas>
+
+</div>
+
+</div>
+
+
+<!-- ================= ACTIONS ================= -->
+
+<div class="actions">
+
+<button
+class="btn-action"
+onclick="exportarCSV()">
+
+📄 Exportar CSV
+
+</button>
+
+<button
+class="btn-action"
+onclick="exportarExcel()">
+
+📥 Exportar Excel
+
+</button>
+
+<button
+class="btn-action"
+onclick="recarregar()">
+
+🔄 Atualizar
+
+</button>
+
+</div>
+
+
+<footer>
+
+Relatório online — Dados armazenados no Supabase
+
+</footer>
+
+</div>
+
+
+<!-- ================= MODAL EXCLUSÃO ================= -->
+
+<div
+class="modal"
+id="modalExcluir">
+
+<div class="modal-content">
+
+<h3>
+🗑️ Excluir nota?
+</h3>
+
+<p id="textoExcluir">
+</p>
+
+<div class="modal-actions">
+
+<button
+class="btn-action"
+onclick="fecharModal()">
+
+Cancelar
+
+</button>
+
+<button
+class="btn-excluir"
+onclick="confirmarExclusao()">
+
+Excluir
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ============================================================
+   CONFIGURAÇÃO SUPABASE
+============================================================ */
+
+const SUPABASE_URL =
+"https://iomskeqqgfgetaymheup.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_LwcQSXB9eLlkhoCRWGDTjg_W2Em1u8F";
+
+const { createClient } = window.supabase;
+
+const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* ============================================================
+   CONFIGURAÇÕES
+============================================================ */
+
+const IMPOSTO_PERCENTUAL = 0.10;
+
+let notas = [];
+
+let notaEditando = null;
+
+let notaExcluindo = null;
+
+
+/* ============================================================
+   FORMATAÇÃO
+============================================================ */
+
+function moeda(valor) {
+
+    return Number(valor || 0).toLocaleString(
+        "pt-BR",
+        {
+            style: "currency",
+            currency: "BRL"
+        }
+    );
+
+}
+
+
+function imposto(valor) {
+
+    return Math.round(
+        Number(valor || 0) *
+        IMPOSTO_PERCENTUAL *
+        100
+    ) / 100;
+
+}
+
+
+function dataBR(data) {
+
+    if (!data) return "";
+
+    const partes = data.split("-");
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+}
+
+
+function escapar(texto) {
+
+    return String(texto)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* ============================================================
+   CARREGAR NOTAS
+============================================================ */
+
+async function carregarNotas() {
+
+    mostrarConexao(true);
+
+    const {
+        data,
+        error
+    } = await db
+        .from("notas")
+        .select("*")
+        .order("data_emissao", {
+            ascending: true
+        });
+
+    if (error) {
+
+        console.error(error);
+
+        mostrarConexao(false);
+
+        mostrarErro(
+            "Não foi possível carregar as notas: " +
+            error.message
+        );
+
+        return;
+    }
+
+    notas = data || [];
+
+    renderizar();
+
+}
+
+
+/* ============================================================
+   RENDERIZAR
+============================================================ */
+
+function renderizar() {
+
+    const tbody =
+        document.getElementById("tbody");
+
+    tbody.innerHTML = "";
+
+    let total = 0;
+    let recebido = 0;
+    let pendente = 0;
+    let impostoTotal = 0;
+
+    let qtdRecebido = 0;
+    let qtdPendente = 0;
+
+    const labels = [];
+    const valores = [];
+    const cores = [];
+
+
+    notas.forEach((n, index) => {
+
+        const valor =
+            Number(n.valor);
+
+        const impostoNota =
+            imposto(valor);
+
+        total += valor;
+
+        impostoTotal += impostoNota;
+
+
+        if (n.status === "Recebido") {
+
+            recebido += valor;
+            qtdRecebido++;
+
+        } else {
+
+            pendente += valor;
+            qtdPendente++;
+
+        }
+
+
+        labels.push(
+            String(n.numero_nota)
+        );
+
+        valores.push(valor);
+
+        cores.push(
+            n.status === "Recebido"
+                ? "#198754"
+                : "#dc3545"
+        );
+
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.className =
+            n.status === "Recebido"
+                ? "linha-recebido"
+                : "linha-pendente";
+
+
+        tr.innerHTML = `
+
+<td>
+    ${index + 1}
+</td>
+
+<td>
+    <strong>
+        ${escapar(n.numero_nota)}
+    </strong>
+</td>
+
+<td>
+    ${dataBR(n.data_emissao)}
+</td>
+
+<td class="valor">
+    ${moeda(valor)}
+</td>
+
+<td class="imposto">
+    ${moeda(impostoNota)}
+</td>
+
+<td>
+
+<select
+class="status ${
+    n.status === "Recebido"
+        ? "status-recebido"
+        : "status-pendente"
+}"
+onchange="alterarStatus('${n.id}', this.value)"
+>
+
+<option
+value="Recebido"
+${n.status === "Recebido" ? "selected" : ""}
+>
+🟢 Recebido
+</option>
+
+<option
+value="Pendente"
+${n.status === "Pendente" ? "selected" : ""}
+>
+🔴 Pendente
+</option>
+
+</select>
+
+</td>
+
+<td>
+
+<div class="acoes">
+
+<button
+class="btn-editar"
+onclick="editarNota('${n.id}')"
+title="Editar"
+>
+✏️
+</button>
+
+<button
+class="btn-excluir"
+onclick="abrirExclusao('${n.id}')"
+title="Excluir"
+>
+🗑️
+</button>
+
+</div>
+
+</td>
+
+`;
+
+        tbody.appendChild(tr);
+
+    });
+
+
+    /* ================= CARDS ================= */
+
+    document.getElementById(
+        "card-total"
+    ).textContent = moeda(total);
+
+
+    document.getElementById(
+        "card-rec"
+    ).textContent = moeda(recebido);
+
+
+    document.getElementById(
+        "card-pen"
+    ).textContent = moeda(pendente);
+
+
+    document.getElementById(
+        "card-imposto"
+    ).textContent = moeda(impostoTotal);
+
+
+    document.getElementById(
+        "card-qtd"
+    ).textContent =
+        notas.length +
+        (notas.length === 1 ? " nota" : " notas");
+
+
+    document.getElementById(
+        "card-qtd-rec"
+    ).textContent =
+        qtdRecebido +
+        (qtdRecebido === 1 ? " nota" : " notas");
+
+
+    document.getElementById(
+        "card-qtd-pen"
+    ).textContent =
+        qtdPendente +
+        (qtdPendente === 1 ? " nota" : " notas");
+
+
+    document.getElementById(
+        "card-pct"
+    ).textContent =
+        total > 0
+            ? ((recebido / total) * 100)
+                .toFixed(1)
+                .replace(".", ",") + "%"
+            : "0%";
+
+
+    /* ================= FOOTER ================= */
+
+    document.getElementById(
+        "tfoot"
+    ).innerHTML = `
+
+<tr>
+
+<td colspan="3"
+style="text-align:right">
+
+TOTAL GERAL
+
+</td>
+
+<td class="valor">
+
+${moeda(total)}
+
+</td>
+
+<td class="imposto">
+
+${moeda(impostoTotal)}
+
+</td>
+
+<td colspan="2">
+
+${notas.length} notas
+
+</td>
+
+</tr>
+
+
+<tr>
+
+<td colspan="3"
+style="text-align:right;color:#198754">
+
+TOTAL RECEBIDO
+
+</td>
+
+<td class="valor"
+style="color:#198754">
+
+${moeda(recebido)}
+
+</td>
+
+<td>
+
+</td>
+
+<td style="color:#198754">
+
+${qtdRecebido} notas
+
+</td>
+
+<td>
+
+</td>
+
+</tr>
+
+
+<tr>
+
+<td colspan="3"
+style="text-align:right;color:#dc3545">
+
+TOTAL PENDENTE
+
+</td>
+
+<td class="valor"
+style="color:#dc3545">
+
+${moeda(pendente)}
+
+</td>
+
+<td>
+
+</td>
+
+<td style="color:#dc3545">
+
+${qtdPendente} notas
+
+</td>
+
+<td>
+
+</td>
+
+</tr>
+
+`;
+
+
+    desenharPie(
+        recebido,
+        pendente
+    );
+
+    desenharBar(
+        labels,
+        valores,
+        cores
+    );
+
+}
+
+
+/* ============================================================
+   ADICIONAR / EDITAR
+============================================================ */
+
+async function salvarNota() {
+
+    limparMensagens();
+
+
+    const numero =
+        parseInt(
+            document.getElementById(
+                "in-nota"
+            ).value
+        );
+
+
+    const data =
+        document.getElementById(
+            "in-data"
+        ).value;
+
+
+    const valor =
+        parseFloat(
+            document.getElementById(
+                "in-valor"
+            ).value
+        );
+
+
+    const status =
+        document.getElementById(
+            "in-status"
+        ).value;
+
+
+    if (
+        !numero ||
+        !data ||
+        !valor ||
+        valor <= 0
+    ) {
+
+        mostrarErro(
+            "Preencha todos os campos corretamente."
+        );
+
+        return;
+    }
+
+
+    /* ================= EDITAR ================= */
+
+    if (notaEditando) {
+
+        const {
+            error
+        } = await db
+            .from("notas")
+            .update({
+
+                numero_nota: numero,
+
+                data_emissao: data,
+
+                valor: valor,
+
+                imposto_provavel:
+                    imposto(valor),
+
+                status: status
+
+            })
+            .eq(
+                "id",
+                notaEditando
+            );
+
+
+        if (error) {
+
+            mostrarErro(
+                "Erro ao editar: " +
+                error.message
+            );
+
+            return;
+        }
+
+
+        mostrarSucesso(
+            "Nota atualizada com sucesso."
+        );
+
+
+        cancelarEdicao();
+
+        return;
+    }
+
+
+    /* ================= VERIFICAR DUPLICIDADE ================= */
+
+    const existente =
+        notas.find(
+            n =>
+                Number(n.numero_nota) ===
+                numero
+        );
+
+
+    if (existente) {
+
+        mostrarErro(
+            "Já existe uma nota com este número."
+        );
+
+        return;
+    }
+
+
+    /* ================= INSERIR ================= */
+
+    const {
+        error
+    } = await db
+        .from("notas")
+        .insert({
+
+            numero_nota: numero,
+
+            data_emissao: data,
+
+            valor: valor,
+
+            imposto_provavel:
+                imposto(valor),
+
+            status: status
+
+        });
+
+
+    if (error) {
+
+        mostrarErro(
+            "Erro ao adicionar: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    limparFormulario();
+
+    mostrarSucesso(
+        "Nota adicionada com sucesso."
+    );
+
+}
+
+
+/* ============================================================
+   EDITAR NOTA
+============================================================ */
+
+function editarNota(id) {
+
+    const nota =
+        notas.find(
+            n => String(n.id) === String(id)
+        );
+
+
+    if (!nota) return;
+
+
+    notaEditando = id;
+
+
+    document.getElementById(
+        "titulo-form"
+    ).textContent =
+        "✏️ Editando Nota Fiscal";
+
+
+    document.getElementById(
+        "in-nota"
+    ).value =
+        nota.numero_nota;
+
+
+    document.getElementById(
+        "in-data"
+    ).value =
+        nota.data_emissao;
+
+
+    document.getElementById(
+        "in-valor"
+    ).value =
+        nota.valor;
+
+
+    document.getElementById(
+        "in-status"
+    ).value =
+        nota.status;
+
+
+    document.getElementById(
+        "btn-salvar"
+    ).textContent =
+        "SALVAR ALTERAÇÃO";
+
+
+    document.getElementById(
+        "btn-cancelar"
+    ).style.display =
+        "block";
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* ============================================================
+   CANCELAR EDIÇÃO
+============================================================ */
+
+function cancelarEdicao() {
+
+    notaEditando = null;
+
+    document.getElementById(
+        "titulo-form"
+    ).textContent =
+        "➕ Adicionar Nova Nota Fiscal";
+
+
+    document.getElementById(
+        "btn-salvar"
+    ).textContent =
+        "ADICIONAR";
+
+
+    document.getElementById(
+        "btn-cancelar"
+    ).style.display =
+        "none";
+
+
+    limparFormulario();
+
+}
+
+
+/* ============================================================
+   ALTERAR STATUS
+============================================================ */
+
+async function alterarStatus(
+    id,
+    novoStatus
+) {
+
+    const {
+        error
+    } = await db
+        .from("notas")
+        .update({
+
+            status: novoStatus
+
+        })
+        .eq(
+            "id",
+            id
+        );
+
+
+    if (error) {
+
+        mostrarErro(
+            "Erro ao alterar status: " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   EXCLUSÃO
+============================================================ */
+
+function abrirExclusao(id) {
+
+    const nota =
+        notas.find(
+            n => String(n.id) === String(id)
+        );
+
+
+    if (!nota) return;
+
+
+    notaExcluindo = id;
+
+
+    document.getElementById(
+        "textoExcluir"
+    ).textContent =
+        `Deseja realmente excluir a NF ${nota.numero_nota} no valor de ${moeda(nota.valor)}?`;
+
+
+    document.getElementById(
+        "modalExcluir"
+    ).style.display =
+        "flex";
+
+}
+
+
+function fecharModal() {
+
+    notaExcluindo = null;
+
+    document.getElementById(
+        "modalExcluir"
+    ).style.display =
+        "none";
+
+}
+
+
+async function confirmarExclusao() {
+
+    if (!notaExcluindo) return;
+
+
+    const {
+        error
+    } = await db
+        .from("notas")
+        .delete()
+        .eq(
+            "id",
+            notaExcluindo
+        );
+
+
+    if (error) {
+
+        mostrarErro(
+            "Erro ao excluir: " +
+            error.message
+        );
+
+    } else {
+
+        mostrarSucesso(
+            "Nota excluída com sucesso."
+        );
+
+    }
+
+
+    fecharModal();
+
+}
+
+
+/* ============================================================
+   LIMPAR FORMULÁRIO
+============================================================ */
+
+function limparFormulario() {
+
+    document.getElementById(
+        "in-nota"
+    ).value = "";
+
+
+    document.getElementById(
+        "in-data"
+    ).value = "";
+
+
+    document.getElementById(
+        "in-valor"
+    ).value = "";
+
+
+    document.getElementById(
+        "in-status"
+    ).value = "Pendente";
+
+}
+
+
+/* ============================================================
+   MENSAGENS
+============================================================ */
+
+function limparMensagens() {
+
+    document.getElementById(
+        "msg-erro"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "msg-sucesso"
+    ).style.display = "none";
+
+}
+
+
+function mostrarErro(msg) {
+
+    const el =
+        document.getElementById(
+            "msg-erro"
+        );
+
+    el.textContent = msg;
+
+    el.style.display = "block";
+
+}
+
+
+function mostrarSucesso(msg) {
+
+    const el =
+        document.getElementById(
+            "msg-sucesso"
+        );
+
+    el.textContent = msg;
+
+    el.style.display = "block";
+
+
+    setTimeout(() => {
+
+        el.style.display = "none";
+
+    }, 3000);
+
+}
+
+
+/* ============================================================
+   CONEXÃO
+============================================================ */
+
+function mostrarConexao(online) {
+
+    const el =
+        document.getElementById(
+            "connection"
+        );
+
+
+    if (online) {
+
+        el.textContent =
+            "🟢 Banco conectado";
+
+        el.classList.remove(
+            "offline"
+        );
+
+    } else {
+
+        el.textContent =
+            "🔴 Erro de conexão";
+
+        el.classList.add(
+            "offline"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   REALTIME
+============================================================ */
+
+function iniciarRealtime() {
+
+    db
+        .channel(
+            "notas-realtime"
+        )
+
+        .on(
+
+            "postgres_changes",
+
+            {
+                event: "*",
+                schema: "public",
+                table: "notas"
+            },
+
+            payload => {
+
+                console.log(
+                    "Alteração recebida:",
+                    payload.eventType
+                );
+
+
+                carregarNotas();
+
+            }
+
+        )
+
+        .subscribe(
+            status => {
+
+                console.log(
+                    "Realtime:",
+                    status
+                );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   ATUALIZAR MANUALMENTE
+============================================================ */
+
+function recarregar() {
+
+    carregarNotas();
+
+}
+
+
+/* ============================================================
+   GRÁFICO PIZZA
+============================================================ */
+
+function desenharPie(
+    recebido,
+    pendente
+) {
+
+    const canvas =
+        document.getElementById(
+            "chartPie"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    const total =
+        recebido + pendente;
+
+
+    if (!total) {
+
+        ctx.fillStyle = "#6c757d";
+
+        ctx.font =
+            "14px sans-serif";
+
+        ctx.textAlign = "center";
+
+        ctx.fillText(
+            "Sem dados",
+            w / 2,
+            h / 2
+        );
+
+        return;
+    }
+
+
+    const cx = w / 2;
+    const cy = h / 2 - 15;
+
+    const r =
+        Math.min(w, h) / 2 - 55;
+
+
+    let inicio =
+        -Math.PI / 2;
+
+
+    const fatias = [
+
+        {
+            valor: recebido,
+            cor: "#198754",
+            nome: "Recebido"
+        },
+
+        {
+            valor: pendente,
+            cor: "#dc3545",
+            nome: "Pendente"
+        }
+
+    ];
+
+
+    fatias.forEach(
+        fatia => {
+
+            if (fatia.valor <= 0)
+                return;
+
+
+            const angulo =
+                fatia.valor /
+                total *
+                Math.PI *
+                2;
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                cx,
+                cy
+            );
+
+            ctx.arc(
+                cx,
+                cy,
+                r,
+                inicio,
+                inicio + angulo
+            );
+
+            ctx.closePath();
+
+            ctx.fillStyle =
+                fatia.cor;
+
+            ctx.fill();
+
+
+            ctx.strokeStyle =
+                "#fff";
+
+            ctx.lineWidth = 3;
+
+            ctx.stroke();
+
+
+            inicio += angulo;
+
+        }
+    );
+
+
+    /* LEGENDA */
+
+    let y = h - 28;
+
+
+    fatias.forEach(
+        fatia => {
+
+            ctx.fillStyle =
+                fatia.cor;
+
+            ctx.fillRect(
+                w / 2 - 90,
+                y,
+                12,
+                12
+            );
+
+
+            ctx.fillStyle =
+                "#333";
+
+            ctx.font =
+                "11px sans-serif";
+
+            ctx.textAlign =
+                "left";
+
+            ctx.fillText(
+                `${fatia.nome}: ${moeda(fatia.valor)}`,
+                w / 2 - 72,
+                y + 10
+            );
+
+
+            y += 18;
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   GRÁFICO BARRAS
+============================================================ */
+
+function desenharBar(
+    labels,
+    valores,
+    cores
+) {
+
+    const canvas =
+        document.getElementById(
+            "chartBar"
+        );
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    if (!valores.length)
+        return;
+
+
+    const margem = {
+
+        top: 25,
+        right: 10,
+        bottom: 60,
+        left: 55
+
+    };
+
+
+    const largura =
+        w -
+        margem.left -
+        margem.right;
+
+
+    const altura =
+        h -
+        margem.top -
+        margem.bottom;
+
+
+    const max =
+        Math.max(
+            ...valores,
+            1
+        );
+
+
+    const espaco =
+        largura /
+        valores.length;
+
+
+    const larguraBarra =
+        espaco * .65;
+
+
+    /* EIXO */
+
+    ctx.strokeStyle =
+        "#dee2e6";
+
+    ctx.lineWidth = 1;
+
+
+    for (
+        let i = 0;
+        i <= 5;
+        i++
+    ) {
+
+        const y =
+            margem.top +
+            altura -
+            altura * i / 5;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            margem.left,
+            y
+        );
+
+        ctx.lineTo(
+            w - margem.right,
+            y
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillStyle =
+            "#6c757d";
+
+        ctx.font =
+            "9px sans-serif";
+
+        ctx.textAlign =
+            "right";
+
+        ctx.fillText(
+            "R$ " +
+            (
+                max *
+                i /
+                5 /
+                1000
+            ).toFixed(0) +
+            "k",
+            margem.left - 5,
+            y
+        );
+
+    }
+
+
+    /* BARRAS */
+
+    valores.forEach(
+        (valor, i) => {
+
+            const x =
+                margem.left +
+                i * espaco +
+                (espaco - larguraBarra) / 2;
+
+
+            const alturaBarra =
+                valor /
+                max *
+                altura;
+
+
+            const y =
+                margem.top +
+                altura -
+                alturaBarra;
+
+
+            ctx.fillStyle =
+                cores[i];
+
+            ctx.fillRect(
+                x,
+                y,
+                larguraBarra,
+                alturaBarra
+            );
+
+
+            /* VALOR */
+
+            ctx.fillStyle =
+                "#333";
+
+            ctx.font =
+                "bold 8px sans-serif";
+
+            ctx.textAlign =
+                "center";
+
+
+            ctx.fillText(
+                "R$ " +
+                (
+                    valor / 1000
+                ).toFixed(1) +
+                "k",
+                x + larguraBarra / 2,
+                Math.max(
+                    y - 5,
+                    10
+                )
+            );
+
+
+            /* NOTA */
+
+            ctx.save();
+
+            ctx.fillStyle =
+                "#6c757d";
+
+            ctx.font =
+                "9px sans-serif";
+
+            ctx.translate(
+                x + larguraBarra / 2,
+                h - margem.bottom + 12
+            );
+
+            ctx.rotate(
+                -Math.PI / 4
+            );
+
+            ctx.fillText(
+                labels[i],
+                0,
+                0
+            );
+
+            ctx.restore();
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   EXPORTAR CSV
+============================================================ */
+
+function exportarCSV() {
+
+    let csv =
+        "Nota,Emissao,Valor,Imposto Provavel,Status\n";
+
+
+    notas.forEach(
+        n => {
+
+            csv +=
+                `${n.numero_nota},` +
+                `${dataBR(n.data_emissao)},` +
+                `${Number(n.valor).toFixed(2).replace(".", ",")},` +
+                `${imposto(n.valor).toFixed(2).replace(".", ",")},` +
+                `${n.status}\n`;
+
+        }
+    );
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        "recebiveis_eta_xerem.csv";
+
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* ============================================================
+   EXPORTAR EXCEL
+============================================================ */
+
+function exportarExcel() {
+
+    let html = `
+
+<table border="1">
+
+<tr>
+
+<th>Nota</th>
+<th>Emissão</th>
+<th>Valor</th>
+<th>Imposto Provável</th>
+<th>Status</th>
+
+</tr>
+
+`;
+
+
+    notas.forEach(
+        n => {
+
+            html += `
+
+<tr>
+
+<td>
+${n.numero_nota}
+</td>
+
+<td>
+${dataBR(n.data_emissao)}
+</td>
+
+<td>
+${Number(n.valor)
+    .toFixed(2)
+    .replace(".", ",")}
+</td>
+
+<td>
+${imposto(n.valor)
+    .toFixed(2)
+    .replace(".", ",")}
+</td>
+
+<td>
+${n.status}
+</td>
+
+</tr>
+
+`;
+
+        }
+    );
+
+
+    html +=
+        "</table>";
+
+
+    const blob =
+        new Blob(
+            [html],
+            {
+                type:
+                    "application/vnd.ms-excel"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        "recebiveis_eta_xerem.xls";
+
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* ============================================================
+   INICIALIZAÇÃO
+============================================================ */
+
+window.addEventListener(
+    "load",
+    async () => {
+
+        await carregarNotas();
+
+        iniciarRealtime();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
