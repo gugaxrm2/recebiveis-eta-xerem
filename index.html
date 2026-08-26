@@ -10,7 +10,6 @@
         body { font-family: Arial, sans-serif; background: #f0f2f5; }
         .container { max-width: 1150px; margin: auto; padding: 16px; }
 
-        /* ===== LOGIN ===== */
         #tela-login { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
         #tela-login.hidden { display: none; }
         .login-box { background: white; border-radius: 20px; padding: 40px 30px; max-width: 400px; width: 100%; }
@@ -25,7 +24,6 @@
         .login-box .erro-login { color: #dc3545; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
         .login-box .sucesso-login { color: #198754; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
 
-        /* ===== SISTEMA ===== */
         #sistema { display: none; }
         #sistema.visible { display: block; }
         header { text-align: center; padding: 20px 0; }
@@ -104,7 +102,6 @@
 </head>
 <body>
 
-<!-- ===== TELA DE LOGIN ===== -->
 <div id="tela-login">
     <div class="login-box">
         <h2>🔐 Acesso ao Sistema</h2>
@@ -123,7 +120,6 @@
     </div>
 </div>
 
-<!-- ===== SISTEMA ===== -->
 <div id="sistema">
 <div class="container">
 <header>
@@ -144,7 +140,6 @@
     <button data-secao="secao-relatorio">📈 Relatório</button>
 </div>
 
-<!-- ===== RECEBÍVEIS ===== -->
 <div id="secao-recebiveis" class="secao ativa">
 <div class="cards">
     <div class="card card-dark"><div class="label">Faturamento</div><div class="value" id="card-total">R$ 0,00</div><div class="sub" id="card-qtd">0 notas</div></div>
@@ -194,7 +189,6 @@
 </div>
 </div>
 
-<!-- ===== FLUXO DE CAIXA ===== -->
 <div id="secao-dashboard" class="secao">
 <div class="cards">
     <div class="card card-green"><div class="label">A Receber</div><div class="value" id="fx-receber">R$ 0,00</div><div class="sub" id="fx-qtd-receber">0 notas</div></div>
@@ -211,7 +205,6 @@
 </div>
 </div>
 
-<!-- ===== CONTAS A PAGAR ===== -->
 <div id="secao-contas" class="secao">
 <div class="form-box">
     <h3>📄 Importar Nota Fiscal (XML)</h3>
@@ -239,7 +232,6 @@
 </div>
 </div>
 
-<!-- ===== FORNECEDORES ===== -->
 <div id="secao-fornecedores" class="secao">
 <div class="form-box">
     <h3 id="titulo-form-fornecedor">🏢 Cadastro de Fornecedor</h3>
@@ -273,7 +265,6 @@
 </div>
 </div>
 
-<!-- ===== PRODUTOS ===== -->
 <div id="secao-produtos" class="secao">
 <div class="form-box">
     <h3 id="titulo-form-produto">📦 Cadastro de Produto</h3>
@@ -298,7 +289,6 @@
 </div>
 </div>
 
-<!-- ===== RELATÓRIO ===== -->
 <div id="secao-relatorio" class="secao">
 <div class="table-wrap">
     <h3 style="padding:12px 16px;font-size:14px;">📈 Relatório Mensal (Recebido × Pago × Saldo)</h3>
@@ -323,7 +313,6 @@
 </div>
 </div>
 
-<!-- ===== MODAL DE EXCLUSÃO ===== -->
 <div class="modal" id="modalExcluir">
     <div class="modal-content">
         <h3>🗑️ Excluir nota?</h3>
@@ -336,17 +325,13 @@
 </div>
 
 <script>
-// ================================================================
 // CONFIGURAÇÃO SUPABASE
-// ================================================================
 const SUPABASE_URL = "https://iomskeqqgfgetaymheup.supabase.co";
 const SUPABASE_KEY = "sb_publishable_LwcQSXB9eLlkhoCRWGDTjg_W2Em1u8F";
 const { createClient } = window.supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ================================================================
 // VARIÁVEIS
-// ================================================================
 const IMPOSTO_PERCENTUAL = 0.10;
 let notas = [];
 let notaEditando = null;
@@ -361,9 +346,7 @@ let contasTodas = [];
 let boletosPorConta = {};
 let dadosRelatorioMensal = [];
 
-// ================================================================
 // AUTENTICAÇÃO
-// ================================================================
 function mostrarSistema() {
     document.getElementById('tela-login').classList.add('hidden');
     document.getElementById('sistema').classList.add('visible');
@@ -437,9 +420,7 @@ async function fazerLogout() {
     mostrarLogin();
 }
 
-// ================================================================
 // UTILIDADES
-// ================================================================
 function moeda(v) { return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
 function imposto(v) { return Math.round(Number(v || 0) * IMPOSTO_PERCENTUAL * 100) / 100; }
 function dataBR(d) { if (!d) return ""; const p = String(d).split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
@@ -447,9 +428,7 @@ function escapar(t) { return String(t == null ? "" : t).replaceAll("&","&amp;").
 function limparNumero(v) { return (v || '').replace(/[^\d]/g, ''); }
 function formatarCNPJ(cnpj) { const c = limparNumero(cnpj); if (c.length !== 14) return cnpj; return c.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5'); }
 
-// ================================================================
-// RECEBÍVEIS (CRUD)
-// ================================================================
+// RECEBÍVEIS
 async function carregarNotas() {
     const { data, error } = await db.from("notas").select("*").order("data_emissao", { ascending: true });
     if (error) { console.error(error); return; }
@@ -596,9 +575,7 @@ function iniciarRealtime() {
         .subscribe();
 }
 
-// ================================================================
 // GRÁFICOS
-// ================================================================
 function desenharPie(recebido, pendente) {
     const canvas = document.getElementById("chartPie");
     const ctx = canvas.getContext("2d");
@@ -656,9 +633,7 @@ function desenharBar(labels, valores, cores) {
     });
 }
 
-// ================================================================
 // EXPORTAÇÕES (recebíveis)
-// ================================================================
 function exportarCSV() {
     let csv = "Nota,Emissao,Valor,Imposto,Status\n";
     notas.forEach(n => { csv += n.numero_nota + "," + dataBR(n.data_emissao) + "," + Number(n.valor).toFixed(2).replace(".", ",") + "," + imposto(n.valor).toFixed(2).replace(".", ",") + "," + n.status + "\n"; });
@@ -676,9 +651,7 @@ function exportarExcel() {
     a.href = url; a.download = "recebiveis_eta_xerem.xls"; a.click(); URL.revokeObjectURL(url);
 }
 
-// ================================================================
-// IMPORTAÇÃO DE XML NF-e
-// ================================================================
+// IMPORTAÇÃO DE XML
 async function importarXML() {
     const box = document.getElementById('resultado-importacao');
     box.innerHTML = '';
@@ -711,7 +684,6 @@ async function importarXML() {
     const icms = infNFe.getElementsByTagName('ICMSTot')[0];
     const valor = parseFloat((icms?.getElementsByTagName('vNF')[0]?.textContent || '0').replace(',', '.')) || 0;
 
-    // Produtos
     const produtosExtraidos = [];
     const dets = infNFe.getElementsByTagName('det');
     for (const det of dets) {
@@ -724,7 +696,6 @@ async function importarXML() {
         produtosExtraidos.push({ descricao: descricao, unidade: unidade, valor_unitario: vUnCom });
     }
 
-    // Boletos (duplicatas)
     const duplicatas = [];
     const dups = infNFe.getElementsByTagName('dup');
     for (const d of dups) {
@@ -738,7 +709,6 @@ async function importarXML() {
         duplicatas.push({ vencimento: venc.toISOString().substring(0, 10), valor: valor });
     }
 
-    // Fornecedor
     let fornecedorId = null;
     if (cnpj) {
         const { data: fornecedor } = await db.from('fornecedores').select('id').eq('cnpj', cnpj).maybeSingle();
@@ -750,7 +720,6 @@ async function importarXML() {
         }
     }
 
-    // Conta a pagar
     const dataVenc = duplicatas[0].vencimento || dataEmissao;
     const { data: conta, error: errC } = await db.from('contas_pagar').insert({
         fornecedor_id: fornecedorId, numero_nota: numero, chave_acesso: chave,
@@ -758,12 +727,10 @@ async function importarXML() {
     }).select().single();
     if (errC) { box.innerHTML = '<p class="error" style="display:block">Erro na conta: ' + errC.message + '</p>'; return; }
 
-    // Boletos
     for (const b of duplicatas) {
         await db.from('boletos').insert({ conta_pagar_id: conta.id, vencimento: b.vencimento, valor: b.valor, status: 'Pendente' });
     }
 
-    // Produtos (sem duplicar)
     let novosProdutos = 0;
     if (produtosExtraidos.length > 0) {
         const { data: existentesProd } = await db.from('produtos').select('descricao');
@@ -777,7 +744,6 @@ async function importarXML() {
         }
     }
 
-    // Registro do XML
     await db.from('xml_importados').insert({ chave_acesso: chave, fornecedor_id: fornecedorId, numero_nota: numero });
 
     box.innerHTML =
@@ -793,9 +759,7 @@ async function importarXML() {
     carregarProdutos();
 }
 
-// ================================================================
 // CONTAS A PAGAR
-// ================================================================
 async function carregarContas() {
     const [rContas, rBoletos] = await Promise.all([
         db.from('contas_pagar').select('*, fornecedores(razao_social)').order('data_vencimento', { ascending: true }),
@@ -840,9 +804,7 @@ function renderizarContas() {
     });
 }
 
-// ================================================================
 // FLUXO DE CAIXA + BOLETOS
-// ================================================================
 async function carregarFluxoCaixa() {
     const { data: notasRec } = await db.from('notas').select('valor,status');
     let aReceber = 0, qtdReceber = 0;
@@ -905,9 +867,7 @@ async function baixarBoleto(id) {
     carregarContas();
 }
 
-// ================================================================
 // FORNECEDORES
-// ================================================================
 async function buscarCNPJ() {
     const cnpj = limparNumero(document.getElementById('forn-cnpj').value);
     if (cnpj.length !== 14) { mostrarErroFornecedor('CNPJ deve ter 14 dígitos.'); return; }
@@ -1000,4 +960,335 @@ async function excluirFornecedor(id) {
     carregarFornecedores();
 }
 
-function lim
+function limparFormFornecedor() {
+    fornecedorEditando = null;
+    document.getElementById('titulo-form-fornecedor').textContent = '🏢 Cadastro de Fornecedor';
+    document.getElementById('btn-salvar-fornecedor').textContent = 'SALVAR';
+    document.getElementById('btn-cancelar-fornecedor').style.display = 'none';
+    ['forn-cnpj','forn-razao','forn-fantasia','forn-email','forn-telefone','forn-endereco'].forEach(id => document.getElementById(id).value = '');
+}
+
+function mostrarErroFornecedor(msg) {
+    const el = document.getElementById('msg-erro-fornecedor');
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3500);
+}
+function mostrarSucessoFornecedor(msg) {
+    const el = document.getElementById('msg-sucesso-fornecedor');
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// PRODUTOS
+async function carregarProdutos() {
+    const { data, error } = await db.from('produtos').select('*').order('descricao');
+    if (error) { console.error(error); return; }
+    produtosTodos = data || [];
+    renderizarProdutos();
+}
+
+function renderizarProdutos() {
+    const tbody = document.getElementById('tbody-produtos');
+    if (!tbody) return;
+    const texto = (document.getElementById('busca-produtos')?.value || '').toLowerCase();
+    const dados = produtosTodos.filter(p => !texto || (p.descricao || '').toLowerCase().includes(texto));
+    tbody.innerHTML = '';
+    if (dados.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="color:#999;padding:20px;">Nenhum produto encontrado.</td></tr>'; return; }
+    dados.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><strong>' + escapar(p.descricao) + '</strong></td>' +
+            '<td>' + escapar(p.unidade || '-') + '</td>' +
+            '<td class="valor">' + moeda(p.valor_unitario) + '</td>' +
+            '<td><div class="acoes"><button class="btn-editar" data-id="' + p.id + '">✏️</button><button class="btn-excluir" data-id="' + p.id + '">🗑️</button></div></td>';
+        tbody.appendChild(tr);
+    });
+}
+
+async function salvarProduto() {
+    const descricao = document.getElementById('prod-descricao').value.trim();
+    if (!descricao) { mostrarErroProduto('Informe a descrição.'); return; }
+    const dados = {
+        descricao: descricao,
+        unidade: document.getElementById('prod-unidade').value.trim() || null,
+        valor_unitario: parseFloat(document.getElementById('prod-valor').value) || 0
+    };
+    if (produtoEditando) {
+        const { error } = await db.from('produtos').update(dados).eq('id', produtoEditando);
+        if (error) { mostrarErroProduto(error.message); return; }
+        mostrarSucessoProduto('Produto atualizado!');
+    } else {
+        const { error } = await db.from('produtos').insert(dados);
+        if (error) { mostrarErroProduto(error.message); return; }
+        mostrarSucessoProduto('Produto cadastrado!');
+    }
+    limparFormProduto();
+    carregarProdutos();
+}
+
+async function editarProduto(id) {
+    const { data } = await db.from('produtos').select('*').eq('id', id).single();
+    if (!data) return;
+    produtoEditando = id;
+    document.getElementById('titulo-form-produto').textContent = '✏️ Editando Produto';
+    document.getElementById('prod-descricao').value = data.descricao || '';
+    document.getElementById('prod-unidade').value = data.unidade || '';
+    document.getElementById('prod-valor').value = data.valor_unitario || '';
+    document.getElementById('btn-salvar-produto').textContent = 'SALVAR';
+    document.getElementById('btn-cancelar-produto').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function excluirProduto(id) {
+    if (!confirm('Excluir este produto?')) return;
+    const { error } = await db.from('produtos').delete().eq('id', id);
+    if (error) { mostrarErroProduto(error.message); return; }
+    mostrarSucessoProduto('Produto excluído.');
+    carregarProdutos();
+}
+
+function limparFormProduto() {
+    produtoEditando = null;
+    document.getElementById('titulo-form-produto').textContent = '📦 Cadastro de Produto';
+    document.getElementById('btn-salvar-produto').textContent = 'SALVAR';
+    document.getElementById('btn-cancelar-produto').style.display = 'none';
+    document.getElementById('prod-descricao').value = '';
+    document.getElementById('prod-unidade').value = '';
+    document.getElementById('prod-valor').value = '';
+}
+
+function mostrarErroProduto(msg) {
+    const el = document.getElementById('msg-erro-produto');
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3500);
+}
+function mostrarSucessoProduto(msg) {
+    const el = document.getElementById('msg-sucesso-produto');
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// RELATÓRIO MENSAL
+async function carregarRelatorio() {
+    const tbody = document.getElementById('tbody-relatorio');
+    if (!tbody) return;
+
+    const [rNotas, rBoletos] = await Promise.all([
+        db.from('notas').select('valor,status,data_emissao'),
+        db.from('boletos').select('valor,status,data_pagamento')
+    ]);
+
+    const meses = {};
+    function chaveMes(dataStr) {
+        if (!dataStr) return null;
+        const p = String(dataStr).substring(0, 10).split('-');
+        return p.length >= 2 ? p[0] + '-' + p[1] : null;
+    }
+
+    (rNotas.data || []).forEach(n => {
+        if (n.status !== 'Recebido') return;
+        const k = chaveMes(n.data_emissao);
+        if (!k) return;
+        if (!meses[k]) meses[k] = { recebido: 0, pago: 0 };
+        meses[k].recebido += Number(n.valor) || 0;
+    });
+
+    (rBoletos.data || []).forEach(b => {
+        if (b.status !== 'Pago') return;
+        const k = chaveMes(b.data_pagamento);
+        if (!k) return;
+        if (!meses[k]) meses[k] = { recebido: 0, pago: 0 };
+        meses[k].pago += Number(b.valor) || 0;
+    });
+
+    const chaves = Object.keys(meses).sort();
+    tbody.innerHTML = '';
+    dadosRelatorioMensal = [];
+
+    if (chaves.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#999;padding:20px;">Sem dados para exibir.</td></tr>';
+        return;
+    }
+
+    const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    let totalR = 0, totalP = 0;
+    chaves.forEach(k => {
+        const m = meses[k];
+        const [ano, mes] = k.split('-');
+        const saldo = m.recebido - m.pago;
+        totalR += m.recebido;
+        totalP += m.pago;
+        dadosRelatorioMensal.push({
+            mes: nomes[parseInt(mes, 10) - 1] + '/' + ano,
+            recebido: m.recebido,
+            pago: m.pago,
+            saldo: saldo
+        });
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><strong>' + nomes[parseInt(mes, 10) - 1] + '/' + ano + '</strong></td>' +
+            '<td style="color:#198754;font-weight:bold;">' + moeda(m.recebido) + '</td>' +
+            '<td style="color:#dc3545;font-weight:bold;">' + moeda(m.pago) + '</td>' +
+            '<td style="font-weight:bold;color:' + (saldo >= 0 ? '#198754' : '#dc3545') + ';">' + moeda(saldo) + '</td>';
+        tbody.appendChild(tr);
+    });
+    const saldoTotal = totalR - totalP;
+    tbody.insertAdjacentHTML('beforeend',
+        '<tr style="background:#e9ecef;font-weight:bold;"><td>TOTAL</td>' +
+        '<td style="color:#198754;">' + moeda(totalR) + '</td>' +
+        '<td style="color:#dc3545;">' + moeda(totalP) + '</td>' +
+        '<td style="color:' + (saldoTotal >= 0 ? '#198754' : '#dc3545') + ';">' + moeda(saldoTotal) + '</td></tr>');
+}
+
+function exportarRelatorioCSV() {
+    if (!dadosRelatorioMensal.length) { alert('Sem dados para exportar.'); return; }
+    let csv = "Mes/Ano,Recebido,Pago,Saldo\n";
+    dadosRelatorioMensal.forEach(d => {
+        csv += d.mes + "," + d.recebido.toFixed(2).replace('.', ',') + "," +
+               d.pago.toFixed(2).replace('.', ',') + "," + d.saldo.toFixed(2).replace('.', ',') + "\n";
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = "relatorio_mensal.csv"; a.click(); URL.revokeObjectURL(url);
+}
+
+function exportarRelatorioExcel() {
+    if (!dadosRelatorioMensal.length) { alert('Sem dados para exportar.'); return; }
+    let html = "<table border='1'><tr><th>Mês/Ano</th><th>Recebido</th><th>Pago</th><th>Saldo</th></tr>";
+    dadosRelatorioMensal.forEach(d => {
+        html += "<tr><td>" + d.mes + "</td><td>" + d.recebido.toFixed(2).replace('.', ',') +
+                "</td><td>" + d.pago.toFixed(2).replace('.', ',') +
+                "</td><td>" + d.saldo.toFixed(2).replace('.', ',') + "</td></tr>";
+    });
+    html += "</table>";
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = "relatorio_mensal.xls"; a.click(); URL.revokeObjectURL(url);
+}
+
+// RESUMO POR FORNECEDOR
+async function carregarResumoFornecedores() {
+    const tbody = document.getElementById('tbody-resumo-fornecedores');
+    if (!tbody) return;
+
+    const [rContas, rFornecedores] = await Promise.all([
+        db.from('contas_pagar').select('fornecedor_id,valor,status'),
+        db.from('fornecedores').select('id,razao_social,cnpj')
+    ]);
+    if (rContas.error || rFornecedores.error) { console.error(rContas.error || rFornecedores.error); return; }
+
+    const fornecMap = {};
+    (rFornecedores.data || []).forEach(f => fornecMap[f.id] = f);
+
+    const resumo = {};
+    (rContas.data || []).forEach(c => {
+        const fid = c.fornecedor_id;
+        if (!resumo[fid]) resumo[fid] = { aberto: 0, pago: 0, total: 0 };
+        const v = Number(c.valor) || 0;
+        resumo[fid].total += v;
+        if (c.status === 'Pago') resumo[fid].pago += v;
+        else resumo[fid].aberto += v;
+    });
+
+    const ids = Object.keys(resumo);
+    tbody.innerHTML = '';
+    if (ids.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#999;padding:20px;">Nenhuma conta cadastrada.</td></tr>';
+        return;
+    }
+
+    let totalAberto = 0, totalPago = 0;
+    ids.forEach(id => {
+        const r = resumo[id];
+        const f = fornecMap[id] || {};
+        totalAberto += r.aberto;
+        totalPago += r.pago;
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><strong>' + escapar(f.razao_social || 'Sem fornecedor') + '</strong></td>' +
+            '<td>' + (f.cnpj ? formatarCNPJ(f.cnpj) : '-') + '</td>' +
+            '<td style="color:#dc3545;font-weight:bold;">' + moeda(r.aberto) + '</td>' +
+            '<td style="color:#198754;font-weight:bold;">' + moeda(r.pago) + '</td>' +
+            '<td style="font-weight:bold;">' + moeda(r.total) + '</td>';
+        tbody.appendChild(tr);
+    });
+    tbody.insertAdjacentHTML('beforeend',
+        '<tr style="background:#e9ecef;font-weight:bold;"><td>TOTAL</td><td></td>' +
+        '<td style="color:#dc3545;">' + moeda(totalAberto) + '</td>' +
+        '<td style="color:#198754;">' + moeda(totalPago) + '</td>' +
+        '<td>' + moeda(totalAberto + totalPago) + '</td></tr>');
+}
+
+// ================================================================
+// EVENTOS — esta seção liga TODOS os botões às funções
+// ================================================================
+document.getElementById('btn-entrar').addEventListener('click', fazerLogin);
+document.getElementById('btn-sair').addEventListener('click', fazerLogout);
+document.getElementById('btn-salvar').addEventListener('click', salvarNota);
+document.getElementById('btn-cancelar').addEventListener('click', cancelarEdicao);
+document.getElementById('btn-recarregar').addEventListener('click', carregarNotas);
+document.getElementById('btn-csv').addEventListener('click', exportarCSV);
+document.getElementById('btn-excel').addEventListener('click', exportarExcel);
+document.getElementById('btn-importar-xml').addEventListener('click', importarXML);
+document.getElementById('btn-salvar-fornecedor').addEventListener('click', salvarFornecedor);
+document.getElementById('btn-cancelar-fornecedor').addEventListener('click', limparFormFornecedor);
+document.getElementById('btn-buscar-cnpj').addEventListener('click', buscarCNPJ);
+document.getElementById('btn-salvar-produto').addEventListener('click', salvarProduto);
+document.getElementById('btn-cancelar-produto').addEventListener('click', limparFormProduto);
+document.getElementById('btn-exportar-relatorio-csv').addEventListener('click', exportarRelatorioCSV);
+document.getElementById('btn-exportar-relatorio-excel').addEventListener('click', exportarRelatorioExcel);
+document.getElementById('btn-cancelar-modal').addEventListener('click', fecharModal);
+document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusao);
+
+// Abas
+document.querySelectorAll('.menu-abas button').forEach(b => {
+    b.addEventListener('click', () => {
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.menu-abas button').forEach(x => x.classList.remove('ativa'));
+        const secao = document.getElementById(b.dataset.secao);
+        if (secao) secao.classList.add('ativa');
+        b.classList.add('ativa');
+    });
+});
+
+// Input do XML
+document.getElementById('in-xml').addEventListener('change', (e) => {
+    xmlArquivo = e.target.files[0] || null;
+});
+
+// Filtros e busca
+document.getElementById('busca-notas').addEventListener('input', () => renderizar(aplicarFiltroNotas()));
+document.getElementById('filtro-status-notas').addEventListener('change', () => renderizar(aplicarFiltroNotas()));
+document.getElementById('busca-contas').addEventListener('input', renderizarContas);
+document.getElementById('filtro-status-contas').addEventListener('change', renderizarContas);
+document.getElementById('busca-fornecedores').addEventListener('input', renderizarFornecedores);
+document.getElementById('busca-produtos').addEventListener('input', renderizarProdutos);
+
+// Ações da tabela de notas
+document.getElementById('tbody').addEventListener('change', (e) => {
+    if (e.target.classList.contains('status')) {
+        alterarStatus(e.target.dataset.id, e.target.value);
+    }
+});
+document.getElementById('tbody').addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-editar')) editarNota(e.target.dataset.id);
+    if (e.target.classList.contains('btn-excluir')) abrirExclusao(e.target.dataset.id);
+});
+
+// Ações da tabela de fornecedores
+document.getElementById('tbody-fornecedores').addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-editar')) editarFornecedor(e.target.dataset.id);
+    if (e.target.classList.contains('btn-excluir')) excluirFornecedor(e.target.dataset.id);
+});
+
+// Ações da tabela de produtos
+document.getElementById('tbody-produtos').addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-editar')) editarProduto(e.target.dataset.id);
+    if (e.target.classList.contains('btn-excluir')) excluirProduto(e.target.dataset.id);
+});
+
+// 🔑 RESTAURA A SESSÃO AO CARREGAR A PÁGINA (chamada obrigatória no final)
+verificarSessao();
+</script>
+</body>
+</html>
