@@ -1012,15 +1012,21 @@ const db = createClient(
 
 
 /* ============================================================
-   AUTENTICAÇÃO
+   AUTENTICAÇÃO - CORRIGIDA
 ============================================================ */
 
 async function verificarSessao() {
-    const { data: { session } } = await db.auth.getSession();
+    try {
+        const { data: { session } } = await db.auth.getSession();
+        console.log('🔍 Sessão atual:', session);
 
-    if (session) {
-        mostrarSistema(true);
-    } else {
+        if (session) {
+            mostrarSistema(true);
+        } else {
+            mostrarSistema(false);
+        }
+    } catch (err) {
+        console.error('❌ Erro ao verificar sessão:', err);
         mostrarSistema(false);
     }
 }
@@ -1032,6 +1038,7 @@ function mostrarSistema(logado) {
     if (logado) {
         telaLogin.classList.add('hidden');
         sistema.classList.add('visible');
+        // Carrega os dados após mostrar o sistema
         carregarNotas();
         iniciarRealtime();
     } else {
@@ -1059,32 +1066,42 @@ async function fazerLogin() {
     btn.disabled = true;
     btn.textContent = '⏳ Entrando...';
 
-    const { data, error } = await db.auth.signInWithPassword({
-        email: email,
-        password: senha
-    });
+    try {
+        const { data, error } = await db.auth.signInWithPassword({
+            email: email,
+            password: senha
+        });
 
-    btn.disabled = false;
-    btn.textContent = 'ENTRAR';
+        btn.disabled = false;
+        btn.textContent = 'ENTRAR';
 
-    if (error) {
-        erroEl.textContent = '❌ ' + error.message;
+        if (error) {
+            erroEl.textContent = '❌ ' + error.message;
+            erroEl.style.display = 'block';
+            console.error('❌ Erro de login:', error);
+            return;
+        }
+
+        if (data.session) {
+            sucessoEl.textContent = '✅ Login realizado com sucesso!';
+            sucessoEl.style.display = 'block';
+            console.log('✅ Sessão criada:', data.session);
+
+            // Limpa os campos
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-senha').value = '';
+
+            // Aguarda 500ms e mostra o sistema
+            setTimeout(() => {
+                mostrarSistema(true);
+            }, 500);
+        }
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'ENTRAR';
+        erroEl.textContent = '❌ Erro na conexão: ' + err.message;
         erroEl.style.display = 'block';
-        return;
-    }
-
-    if (data.session) {
-        sucessoEl.textContent = '✅ Login realizado com sucesso!';
-        sucessoEl.style.display = 'block';
-
-        // Limpa os campos
-        document.getElementById('login-email').value = '';
-        document.getElementById('login-senha').value = '';
-
-        // Aguarda 1s e mostra o sistema
-        setTimeout(() => {
-            mostrarSistema(true);
-        }, 1000);
+        console.error('❌ Erro inesperado:', err);
     }
 }
 
@@ -1947,4 +1964,11 @@ function limparFormulario() {
 
 function limparMensagens() {
 
-    document
+    document.getElementById(
+        "msg-erro"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "msg-sucesso"
+   
