@@ -102,7 +102,7 @@
             <label for="login-senha">Senha</label>
             <input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password">
         </div>
-        <button class="btn-entrar" id="btn-entrar">ENTRAR</button>
+        <button class="btn-entrar" id="btn-entrar" onclick="fazerLogin()">ENTRAR</button>
         <div class="erro-login" id="login-erro"></div>
         <div class="sucesso-login" id="login-sucesso"></div>
     </div>
@@ -116,7 +116,7 @@
     <p>CONSÓRCIO ETA XERÉM</p>
     <div class="header-actions">
         <div id="connection" class="connection">🟢 Banco conectado</div>
-        <button class="btn-sair">🚪 Sair</button>
+        <button class="btn-sair" onclick="fazerLogout()">🚪 Sair</button>
     </div>
 </header>
 
@@ -189,12 +189,8 @@ const { createClient } = window.supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ================================================================
-// AUTENTICAÇÃO
+// AUTENTICAÇÃO - USANDO onclick (mais confiável)
 // ================================================================
-
-window.fazerLogin = fazerLogin;
-window.fazerLogout = fazerLogout;
-window.verificarSessao = verificarSessao;
 
 async function verificarSessao() {
     try {
@@ -227,8 +223,9 @@ function mostrarSistema(logado) {
     }
 }
 
+// Função chamada pelo onclick do botão
 async function fazerLogin() {
-    console.log('🔑 Função fazerLogin() chamada!');
+    console.log('🔑 Botão ENTRAR clicado!');
     
     const email = document.getElementById('login-email').value.trim();
     const senha = document.getElementById('login-senha').value;
@@ -294,28 +291,11 @@ async function fazerLogout() {
 }
 
 // ================================================================
-// INICIALIZAÇÃO E EVENTOS
+// INICIALIZAÇÃO
 // ================================================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM carregado!');
-    
-    verificarSessao();
-    
-    const btnEntrar = document.getElementById('btn-entrar');
-    if (btnEntrar) {
-        console.log('✅ Botão ENTRAR conectado!');
-        btnEntrar.addEventListener('click', fazerLogin);
-    } else {
-        console.error('❌ Botão ENTRAR NÃO encontrado!');
-    }
-    
-    const btnSair = document.querySelector('.btn-sair');
-    if (btnSair) {
-        btnSair.addEventListener('click', fazerLogout);
-        console.log('✅ Botão SAIR conectado!');
-    }
-});
+// Verifica sessão ao carregar a página
+verificarSessao();
 
 // ================================================================
 // TODAS AS OUTRAS FUNÇÕES (CRUD, GRÁFICOS, EXPORTAÇÕES)
@@ -572,7 +552,4 @@ function desenharBar(labels, valores, cores) {
     const altura = h - margem.top - margem.bottom;
     const max = Math.max(...valores, 1);
     const espaco = largura / valores.length;
-    const larguraBarra = espaco * .65;
-
-    for (let i = 0; i <= 5; i++) {
-        const y =
+    const larguraBarra = espaco
