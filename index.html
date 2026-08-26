@@ -10,112 +10,543 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* ===== TODOS OS ESTILOS AQUI ===== */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; padding-bottom: 40px; }
-.container { max-width: 1100px; margin: auto; padding: 16px; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-/* TELA DE LOGIN */
-#tela-login { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-#tela-login.hidden { display: none; }
-.login-box { background: white; border-radius: 20px; padding: 40px 30px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-.login-box h2 { text-align: center; font-size: 22px; color: #1a1a2e; margin-bottom: 5px; }
-.login-box .sub { text-align: center; font-size: 13px; color: #6c757d; margin-bottom: 25px; }
-.login-box .form-group { margin-bottom: 16px; }
-.login-box .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 5px; }
-.login-box .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #ced4da; border-radius: 10px; font-size: 15px; background: #f8f9fa; }
-.login-box .form-group input:focus { outline: none; border-color: #0d6efd; background: white; }
-.login-box .btn-entrar { width: 100%; padding: 13px; background: #0d6efd; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background .2s; }
-.login-box .btn-entrar:hover { background: #0b5ed7; }
-.login-box .btn-entrar:disabled { opacity: .6; cursor: not-allowed; }
-.login-box .erro-login { color: #dc3545; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
-.login-box .sucesso-login { color: #198754; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    padding-bottom: 40px;
+}
 
-/* SISTEMA */
-#sistema { display: none; }
-#sistema.visible { display: block; }
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 16px;
+}
 
-/* HEADER */
-header { text-align: center; padding: 20px 0 10px; position: relative; }
-header h1 { font-size: 23px; }
-header p { font-size: 13px; color: #6c757d; margin-top: 5px; }
-.header-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-.connection { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 20px; font-size: 11px; background: #d4edda; color: #198754; font-weight: bold; }
-.connection.offline { background: #f8d7da; color: #dc3545; }
-.btn-sair { background: #dc3545; color: white; border: none; border-radius: 20px; padding: 5px 16px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background .2s; }
-.btn-sair:hover { background: #b02a37; }
+/* ================= LOGIN ================= */
 
-/* CARDS */
-.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
-@media(min-width: 700px) { .cards { grid-template-columns: repeat(5, 1fr); } }
-.card { border-radius: 14px; padding: 15px 10px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-.card .label { font-size: 10px; opacity: .85; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
-.card .value { font-size: 18px; font-weight: bold; }
-.card .sub { font-size: 10px; opacity: .8; margin-top: 3px; }
+#tela-login {
+    position: fixed;
+    inset: 0;
+    background: #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+#tela-login.hidden {
+    display: none;
+}
+
+.login-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.login-box h2 {
+    text-align: center;
+    font-size: 22px;
+    color: #1a1a2e;
+    margin-bottom: 5px;
+}
+
+.login-box .sub {
+    text-align: center;
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+.login-box .form-group {
+    margin-bottom: 16px;
+}
+
+.login-box .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.login-box .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #f8f9fa;
+}
+
+.login-box .form-group input:focus {
+    outline: none;
+    border-color: #0d6efd;
+    background: white;
+}
+
+.login-box .btn-entrar {
+    width: 100%;
+    padding: 13px;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.login-box .btn-entrar:hover {
+    background: #0b5ed7;
+}
+
+.login-box .btn-entrar:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.login-box .erro-login {
+    color: #dc3545;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    display: none;
+}
+
+.login-box .sucesso-login {
+    color: #198754;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    display: none;
+}
+
+/* ================= HEADER ================= */
+
+header {
+    text-align: center;
+    padding: 20px 0 10px;
+    position: relative;
+}
+
+header h1 {
+    font-size: 23px;
+}
+
+header p {
+    font-size: 13px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.connection {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    background: #d4edda;
+    color: #198754;
+    font-weight: bold;
+}
+
+.connection.offline {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+.btn-sair {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.btn-sair:hover {
+    background: #b02a37;
+}
+
+/* ================= CARDS ================= */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 16px 0;
+}
+
+@media(min-width: 700px) {
+    .cards {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.card {
+    border-radius: 14px;
+    padding: 15px 10px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.card .label {
+    font-size: 10px;
+    opacity: .85;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.card .value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card .sub {
+    font-size: 10px;
+    opacity: .8;
+    margin-top: 3px;
+}
+
 .card-dark { background: #1a1a2e; }
 .card-green { background: #198754; }
 .card-red { background: #dc3545; }
 .card-blue { background: #0d6efd; }
 .card-orange { background: #fd7e14; }
 
-/* FORM */
-.form-box { background: white; border-radius: 14px; padding: 16px; margin: 16px 0; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-.form-box h3 { font-size: 14px; margin-bottom: 12px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-@media(min-width: 700px) { .form-grid { grid-template-columns: 1fr 1.2fr 1.3fr 1fr auto; align-items: end; } }
-.form-group label { display: block; font-size: 11px; color: #6c757d; margin-bottom: 4px; font-weight: 500; }
-.form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; background: #f8f9fa; }
-.btn-add { background: #0d6efd; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
-.btn-cancel { background: #6c757d; color: white; border: none; border-radius: 10px; padding: 10px 15px; font-size: 13px; font-weight: bold; cursor: pointer; display: none; width: 100%; }
-.error { color: #dc3545; font-size: 12px; margin-top: 8px; display: none; }
-.success { color: #198754; font-size: 12px; margin-top: 8px; display: none; }
+/* ================= FORM ================= */
 
-/* TABLE */
-.table-wrap { background: white; border-radius: 14px; overflow-x: auto; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin: 16px 0; }
-table { width: 100%; min-width: 850px; border-collapse: collapse; font-size: 13px; }
-thead { background: #1a1a2e; color: white; }
-th { padding: 12px 10px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
-td { padding: 10px; border-bottom: 1px solid #e9ecef; text-align: center; }
-td.valor, td.imposto { text-align: right; font-weight: bold; }
+.form-box {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin: 16px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
 
-/* STATUS */
-.status { border-radius: 8px; padding: 6px 10px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
-.status-recebido { background: #198754; }
-.status-pendente { background: #dc3545; }
-.linha-recebido td { background: #d4edda; }
-.linha-pendente td { background: #f8d7da; }
+.form-box h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
 
-/* AÇÕES */
-.acoes { display: flex; gap: 5px; justify-content: center; }
-.btn-editar, .btn-excluir { border: none; border-radius: 7px; padding: 6px 9px; cursor: pointer; color: white; font-size: 12px; }
-.btn-editar { background: #0d6efd; }
-.btn-excluir { background: #dc3545; }
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
 
-/* FOOTER TABLE */
-tfoot { background: #e9ecef; font-weight: bold; }
-tfoot td { padding: 11px; }
+@media(min-width: 700px) {
+    .form-grid {
+        grid-template-columns: 1fr 1.2fr 1.3fr 1fr auto;
+        align-items: end;
+    }
+}
 
-/* CHARTS */
-.charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 16px 0; }
-@media(min-width: 700px) { .charts { grid-template-columns: 1fr 1fr; } }
-.chart-box { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); text-align: center; }
-.chart-box h4 { font-size: 13px; margin-bottom: 10px; }
-canvas { max-width: 100%; height: auto; }
+.form-group label {
+    display: block;
+    font-size: 11px;
+    color: #6c757d;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
 
-/* ACTIONS */
-.actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 16px 0; }
-.btn-action { background: white; border: 1px solid #dee2e6; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; color: #1a1a2e; }
-.btn-action:hover { background: #f8f9fa; }
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #f8f9fa;
+}
 
-/* MODAL */
-.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-.modal-content { background: white; width: 100%; max-width: 450px; border-radius: 15px; padding: 20px; }
-.modal-content h3 { margin-bottom: 15px; }
-.modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-.modal-actions button { flex: 1; }
+.btn-add {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
 
-/* MOBILE */
-@media(max-width: 599px) { .cards { grid-template-columns: 1fr 1fr; } header h1 { font-size: 20px; } }
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    width: 100%;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+}
+
+.success {
+    color: #198754;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+    background: white;
+    border-radius: 14px;
+    overflow-x: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    margin: 16px 0;
+}
+
+table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+thead {
+    background: #1a1a2e;
+    color: white;
+}
+
+th {
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+}
+
+td.valor,
+td.imposto {
+    text-align: right;
+    font-weight: bold;
+}
+
+/* ================= STATUS ================= */
+
+.status {
+    border-radius: 8px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.status-recebido {
+    background: #198754;
+}
+
+.status-pendente {
+    background: #dc3545;
+}
+
+.linha-recebido td {
+    background: #d4edda;
+}
+
+.linha-pendente td {
+    background: #f8d7da;
+}
+
+/* ================= AÇÕES ================= */
+
+.acoes {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-editar,
+.btn-excluir {
+    border: none;
+    border-radius: 7px;
+    padding: 6px 9px;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+}
+
+.btn-editar {
+    background: #0d6efd;
+}
+
+.btn-excluir {
+    background: #dc3545;
+}
+
+/* ================= FOOTER TABLE ================= */
+
+tfoot {
+    background: #e9ecef;
+    font-weight: bold;
+}
+
+tfoot td {
+    padding: 11px;
+}
+
+/* ================= CHARTS ================= */
+
+.charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+@media(min-width: 700px) {
+    .charts {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.chart-box {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    text-align: center;
+}
+
+.chart-box h4 {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ================= ACTIONS ================= */
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.btn-action {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #1a1a2e;
+}
+
+.btn-action:hover {
+    background: #f8f9fa;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width: 599px) {
+    .cards {
+        grid-template-columns: 1fr 1fr;
+    }
+    header h1 {
+        font-size: 20px;
+    }
+}
+
+/* ================= MODAL ================= */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-actions button {
+    flex: 1;
+}
+
+/* ================= SISTEMA (oculto quando não logado) ================= */
+
+#sistema {
+    display: none;
+}
+
+#sistema.visible {
+    display: block;
+}
 </style>
 </head>
 
@@ -228,15 +659,21 @@ const { createClient } = window.supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ============================================================
-   AUTENTICAÇÃO
+   AUTENTICAÇÃO - VERSÃO CORRIGIDA
 ============================================================ */
+
 async function verificarSessao() {
     try {
         const { data: { session } } = await db.auth.getSession();
-        console.log('🔍 Sessão atual:', session);
+        console.log('🔍 Sessão atual:', session ? 'Ativa' : 'Nenhuma');
+
         if (session) {
+            console.log('✅ Sessão encontrada, mostrando sistema...');
             mostrarSistema(true);
+            await carregarNotas();
+            iniciarRealtime();
         } else {
+            console.log('🔒 Nenhuma sessão, mostrando login...');
             mostrarSistema(false);
         }
     } catch (err) {
@@ -248,11 +685,10 @@ async function verificarSessao() {
 function mostrarSistema(logado) {
     const telaLogin = document.getElementById('tela-login');
     const sistema = document.getElementById('sistema');
+
     if (logado) {
         telaLogin.classList.add('hidden');
         sistema.classList.add('visible');
-        carregarNotas();
-        iniciarRealtime();
     } else {
         telaLogin.classList.remove('hidden');
         sistema.classList.remove('visible');
@@ -294,15 +730,19 @@ async function fazerLogin() {
             return;
         }
 
-        if (data.session) {
+        if (data && data.session) {
+            console.log('✅ Login realizado com sucesso!');
+            console.log('👤 Usuário:', data.user.email);
+            
             sucessoEl.textContent = '✅ Login realizado com sucesso!';
             sucessoEl.style.display = 'block';
-            console.log('✅ Sessão criada:', data.session);
+
             document.getElementById('login-email').value = '';
             document.getElementById('login-senha').value = '';
-            setTimeout(() => {
-                mostrarSistema(true);
-            }, 500);
+
+            mostrarSistema(true);
+            await carregarNotas();
+            iniciarRealtime();
         }
     } catch (err) {
         btn.disabled = false;
@@ -337,14 +777,17 @@ let realtimeChannel = null;
 function moeda(valor) {
     return Number(valor || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
 function imposto(valor) {
     return Math.round(Number(valor || 0) * IMPOSTO_PERCENTUAL * 100) / 100;
 }
+
 function dataBR(data) {
     if (!data) return "";
     const partes = data.split("-");
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
+
 function escapar(texto) {
     return String(texto).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 }
@@ -532,11 +975,13 @@ function limparMensagens() {
     document.getElementById("msg-erro").style.display = "none";
     document.getElementById("msg-sucesso").style.display = "none";
 }
+
 function mostrarErro(msg) {
     const el = document.getElementById("msg-erro");
     el.textContent = msg;
     el.style.display = "block";
 }
+
 function mostrarSucesso(msg) {
     const el = document.getElementById("msg-sucesso");
     el.textContent = msg;
@@ -596,8 +1041,4 @@ function desenharPie(recebido, pendente) {
     }
     const cx = w / 2, cy = h / 2 - 15, r = Math.min(w, h) / 2 - 55;
     let inicio = -Math.PI / 2;
-    const fatias = [{ valor: recebido, cor: "#198754", nome: "Recebido" }, { valor: pendente, cor: "#dc3545", nome: "Pendente" }];
-    fatias.forEach(fatia => {
-        if (fatia.valor <= 0) return;
-        const angulo = fatia.valor / total * Math.PI * 2;
-        ctx.begin
+    const fatias = [{ valor: recebido, cor: "#198754", nome: "Recebido" },
