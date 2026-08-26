@@ -3,86 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Recebíveis - Consórcio ETA Xerém</title>
+    <title>Controle de Recebíveis</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; padding-bottom: 40px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
         .container { max-width: 1100px; margin: auto; padding: 16px; }
-        #tela-login { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        
+        /* TELA DE LOGIN */
+        #tela-login {
+            position: fixed; inset: 0;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
         #tela-login.hidden { display: none; }
-        .login-box { background: white; border-radius: 20px; padding: 40px 30px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-        .login-box h2 { text-align: center; font-size: 22px; color: #1a1a2e; margin-bottom: 5px; }
-        .login-box .sub { text-align: center; font-size: 13px; color: #6c757d; margin-bottom: 25px; }
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-box h2 { text-align: center; font-size: 22px; color: #1a1a2e; }
+        .login-box .sub { text-align: center; font-size: 13px; color: #666; margin-bottom: 25px; }
         .login-box .form-group { margin-bottom: 16px; }
-        .login-box .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 5px; }
-        .login-box .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #ced4da; border-radius: 10px; font-size: 15px; background: #f8f9fa; }
-        .login-box .form-group input:focus { outline: none; border-color: #0d6efd; background: white; }
-        .login-box .btn-entrar { width: 100%; padding: 13px; background: #0d6efd; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background .2s; }
+        .login-box .form-group label { display: block; font-size: 12px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .login-box .form-group input {
+            width: 100%; padding: 12px 14px;
+            border: 1px solid #ced4da; border-radius: 10px;
+            font-size: 15px;
+        }
+        .login-box .btn-entrar {
+            width: 100%; padding: 13px;
+            background: #0d6efd; color: white;
+            border: none; border-radius: 10px;
+            font-size: 16px; font-weight: bold;
+            cursor: pointer;
+        }
         .login-box .btn-entrar:hover { background: #0b5ed7; }
-        .login-box .btn-entrar:disabled { opacity: .6; cursor: not-allowed; }
+        .login-box .btn-entrar:disabled { opacity: 0.6; }
         .login-box .erro-login { color: #dc3545; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
         .login-box .sucesso-login { color: #198754; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+        
+        /* SISTEMA */
         #sistema { display: none; }
         #sistema.visible { display: block; }
-        header { text-align: center; padding: 20px 0 10px; }
+        
+        header { text-align: center; padding: 20px 0; }
         header h1 { font-size: 23px; }
-        header p { font-size: 13px; color: #6c757d; margin-top: 5px; }
-        .header-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-        .connection { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 20px; font-size: 11px; background: #d4edda; color: #198754; font-weight: bold; }
-        .connection.offline { background: #f8d7da; color: #dc3545; }
+        header p { font-size: 13px; color: #6c757d; }
+        .header-actions { display: flex; justify-content: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+        .connection { padding: 5px 10px; border-radius: 20px; font-size: 11px; background: #d4edda; color: #198754; font-weight: bold; }
         .btn-sair { background: #dc3545; color: white; border: none; border-radius: 20px; padding: 5px 16px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-sair:hover { background: #b02a37; }
+        
         .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
         @media(min-width:700px){ .cards { grid-template-columns: repeat(5, 1fr); } }
-        .card { border-radius: 14px; padding: 15px 10px; text-align: center; color: white; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
-        .card .label { font-size: 10px; opacity: .85; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+        .card { border-radius: 14px; padding: 15px 10px; text-align: center; color: white; }
+        .card .label { font-size: 10px; opacity: 0.85; text-transform: uppercase; }
         .card .value { font-size: 18px; font-weight: bold; }
-        .card .sub { font-size: 10px; opacity: .8; margin-top: 3px; }
+        .card .sub { font-size: 10px; opacity: 0.8; margin-top: 3px; }
         .card-dark { background: #1a1a2e; }
         .card-green { background: #198754; }
         .card-red { background: #dc3545; }
         .card-blue { background: #0d6efd; }
         .card-orange { background: #fd7e14; }
-        .form-box { background: white; border-radius: 14px; padding: 16px; margin: 16px 0; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+        
+        .form-box { background: white; border-radius: 14px; padding: 16px; margin: 16px 0; }
         .form-box h3 { font-size: 14px; margin-bottom: 12px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media(min-width:700px){ .form-grid { grid-template-columns: 1fr 1.2fr 1.3fr 1fr auto; align-items: end; } }
         .form-group label { display: block; font-size: 11px; color: #6c757d; margin-bottom: 4px; font-weight: 500; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; background: #f8f9fa; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 10px; font-size: 14px; }
         .btn-add { background: #0d6efd; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: bold; cursor: pointer; width: 100%; }
         .btn-cancel { background: #6c757d; color: white; border: none; border-radius: 10px; padding: 10px 15px; font-size: 13px; font-weight: bold; cursor: pointer; display: none; width: 100%; }
         .error { color: #dc3545; font-size: 12px; margin-top: 8px; display: none; }
         .success { color: #198754; font-size: 12px; margin-top: 8px; display: none; }
-        .table-wrap { background: white; border-radius: 14px; overflow-x: auto; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin: 16px 0; }
+        
+        .table-wrap { background: white; border-radius: 14px; overflow-x: auto; margin: 16px 0; }
         table { width: 100%; min-width: 850px; border-collapse: collapse; font-size: 13px; }
         thead { background: #1a1a2e; color: white; }
-        th { padding: 12px 10px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+        th { padding: 12px 10px; text-align: center; font-size: 11px; text-transform: uppercase; }
         td { padding: 10px; border-bottom: 1px solid #e9ecef; text-align: center; }
         td.valor, td.imposto { text-align: right; font-weight: bold; }
+        
         .status { border-radius: 8px; padding: 6px 10px; border: none; font-size: 11px; font-weight: bold; cursor: pointer; color: white; }
         .status-recebido { background: #198754; }
         .status-pendente { background: #dc3545; }
         .linha-recebido td { background: #d4edda; }
         .linha-pendente td { background: #f8d7da; }
+        
         .acoes { display: flex; gap: 5px; justify-content: center; }
         .btn-editar, .btn-excluir { border: none; border-radius: 7px; padding: 6px 9px; cursor: pointer; color: white; font-size: 12px; }
         .btn-editar { background: #0d6efd; }
         .btn-excluir { background: #dc3545; }
+        
         tfoot { background: #e9ecef; font-weight: bold; }
         tfoot td { padding: 11px; }
+        
         .charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 16px 0; }
         @media(min-width:700px){ .charts { grid-template-columns: 1fr 1fr; } }
-        .chart-box { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); text-align: center; }
+        .chart-box { background: white; border-radius: 14px; padding: 16px; text-align: center; }
         .chart-box h4 { font-size: 13px; margin-bottom: 10px; }
         canvas { max-width: 100%; height: auto; }
+        
         .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 16px 0; }
-        .btn-action { background: white; border: 1px solid #dee2e6; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; color: #1a1a2e; }
-        .btn-action:hover { background: #f8f9fa; }
-        @media(max-width:599px){ .cards { grid-template-columns: 1fr 1fr; } header h1 { font-size: 20px; } }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .btn-action { background: white; border: 1px solid #dee2e6; border-radius: 10px; padding: 10px 18px; font-size: 13px; cursor: pointer; }
+        
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 15px; padding: 20px; }
-        .modal-content h3 { margin-bottom: 15px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
         .modal-actions button { flex: 1; }
     </style>
@@ -95,20 +128,20 @@
         <h2>🔐 Acesso ao Sistema</h2>
         <p class="sub">Consórcio ETA Xerém</p>
         <div class="form-group">
-            <label for="login-email">E-mail</label>
-            <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
+            <label>E-mail</label>
+            <input type="email" id="login-email" placeholder="seu@email.com">
         </div>
         <div class="form-group">
-            <label for="login-senha">Senha</label>
-            <input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password">
+            <label>Senha</label>
+            <input type="password" id="login-senha" placeholder="••••••••">
         </div>
-        <button class="btn-entrar" id="btn-entrar" onclick="fazerLogin()">ENTRAR</button>
+        <button class="btn-entrar" id="btn-entrar">ENTRAR</button>
         <div class="erro-login" id="login-erro"></div>
         <div class="sucesso-login" id="login-sucesso"></div>
     </div>
 </div>
 
-<!-- SISTEMA PRINCIPAL -->
+<!-- SISTEMA -->
 <div id="sistema">
 <div class="container">
 <header>
@@ -116,7 +149,7 @@
     <p>CONSÓRCIO ETA XERÉM</p>
     <div class="header-actions">
         <div id="connection" class="connection">🟢 Banco conectado</div>
-        <button class="btn-sair" onclick="fazerLogout()">🚪 Sair</button>
+        <button class="btn-sair" id="btn-sair">🚪 Sair</button>
     </div>
 </header>
 
@@ -136,8 +169,8 @@
         <div class="form-group"><label>Valor (R$)</label><input type="number" step="0.01" id="in-valor" placeholder="0,00"></div>
         <div class="form-group"><label>Status</label><select id="in-status"><option value="Pendente">🔴 Pendente</option><option value="Recebido">🟢 Recebido</option></select></div>
         <div class="form-group">
-            <button class="btn-add" id="btn-salvar" onclick="salvarNota()">ADICIONAR</button>
-            <button class="btn-cancel" id="btn-cancelar" onclick="cancelarEdicao()">CANCELAR</button>
+            <button class="btn-add" id="btn-salvar">ADICIONAR</button>
+            <button class="btn-cancel" id="btn-cancelar">CANCELAR</button>
         </div>
     </div>
     <div class="error" id="msg-erro"></div>
@@ -146,7 +179,7 @@
 
 <div class="table-wrap">
     <table>
-        <thead><tr><th>#</th><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto Provável</th><th>Status</th><th>Ações</th></tr></thead>
+        <thead><tr><th>#</th><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto</th><th>Status</th><th>Ações</th></tr></thead>
         <tbody id="tbody"></tbody>
         <tfoot id="tfoot"></tfoot>
     </table>
@@ -154,46 +187,52 @@
 
 <div class="charts">
     <div class="chart-box"><h4>Distribuição Financeira</h4><canvas id="chartPie" width="400" height="280"></canvas></div>
-    <div class="chart-box"><h4>Valores por Nota Fiscal</h4><canvas id="chartBar" width="500" height="280"></canvas></div>
+    <div class="chart-box"><h4>Valores por Nota</h4><canvas id="chartBar" width="500" height="280"></canvas></div>
 </div>
 
 <div class="actions">
-    <button class="btn-action" onclick="exportarCSV()">📄 Exportar CSV</button>
-    <button class="btn-action" onclick="exportarExcel()">📥 Exportar Excel</button>
-    <button class="btn-action" onclick="recarregar()">🔄 Atualizar</button>
+    <button class="btn-action" id="btn-csv">📄 Exportar CSV</button>
+    <button class="btn-action" id="btn-excel">📥 Exportar Excel</button>
+    <button class="btn-action" id="btn-recarregar">🔄 Atualizar</button>
 </div>
 
 <footer>Relatório online — Dados armazenados no Supabase</footer>
 </div>
 </div>
 
-<!-- MODAL EXCLUSÃO -->
+<!-- MODAL -->
 <div class="modal" id="modalExcluir">
     <div class="modal-content">
         <h3>🗑️ Excluir nota?</h3>
         <p id="textoExcluir"></p>
         <div class="modal-actions">
-            <button class="btn-action" onclick="fecharModal()">Cancelar</button>
-            <button class="btn-excluir" onclick="confirmarExclusao()">Excluir</button>
+            <button class="btn-action" id="btn-cancelar-modal">Cancelar</button>
+            <button class="btn-excluir" id="btn-confirmar-exclusao">Excluir</button>
         </div>
     </div>
 </div>
 
 <script>
+// ================================================================
 // CONFIGURAÇÃO SUPABASE
+// ================================================================
 const SUPABASE_URL = "https://iomskeqqgfgetaymheup.supabase.co";
 const SUPABASE_KEY = "sb_publishable_LwcQSXB9eLlkhoCRWGDTjg_W2Em1u8F";
 const { createClient } = window.supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// VARIÁVEIS GLOBAIS
+// ================================================================
+// VARIÁVEIS
+// ================================================================
+const IMPOSTO_PERCENTUAL = 0.10;
 let notas = [];
 let notaEditando = null;
 let notaExcluindo = null;
 let realtimeChannel = null;
-const IMPOSTO_PERCENTUAL = 0.10;
 
-// ===== FUNÇÕES DE AUTENTICAÇÃO =====
+// ================================================================
+// AUTENTICAÇÃO
+// ================================================================
 
 async function verificarSessao() {
     try {
@@ -254,6 +293,7 @@ async function fazerLogin() {
             console.log('✅ Login OK!');
             sucesso.textContent = '✅ Login realizado!';
             sucesso.style.display = 'block';
+            
             document.getElementById('login-email').value = '';
             document.getElementById('login-senha').value = '';
             
@@ -278,18 +318,38 @@ async function fazerLogout() {
     document.getElementById('sistema').classList.remove('visible');
 }
 
-// ===== FUNÇÕES DE UTILIDADE =====
+// ================================================================
+// UTILIDADES
+// ================================================================
 
-function moeda(v) { return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
-function imposto(v) { return Math.round(Number(v || 0) * IMPOSTO_PERCENTUAL * 100) / 100; }
-function dataBR(d) { if (!d) return ""; const p = d.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
-function escapar(t) { return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+function moeda(v) {
+    return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
-// ===== CRUD =====
+function imposto(v) {
+    return Math.round(Number(v || 0) * IMPOSTO_PERCENTUAL * 100) / 100;
+}
+
+function dataBR(d) {
+    if (!d) return "";
+    const p = d.split("-");
+    return p[2] + "/" + p[1] + "/" + p[0];
+}
+
+function escapar(t) {
+    return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+// ================================================================
+// CRUD
+// ================================================================
 
 async function carregarNotas() {
     const { data, error } = await db.from("notas").select("*").order("data_emissao", { ascending: true });
-    if (error) { console.error(error); return; }
+    if (error) {
+        console.error(error);
+        return;
+    }
     notas = data || [];
     renderizar();
 }
@@ -304,8 +364,15 @@ function renderizar() {
     notas.forEach((n, i) => {
         const v = Number(n.valor);
         const imp = imposto(v);
-        total += v; impTotal += imp;
-        if (n.status === "Recebido") { recebido += v; qtdRec++; } else { pendente += v; qtdPen++; }
+        total += v;
+        impTotal += imp;
+        if (n.status === "Recebido") {
+            recebido += v;
+            qtdRec++;
+        } else {
+            pendente += v;
+            qtdPen++;
+        }
         labels.push(String(n.numero_nota));
         valores.push(v);
         cores.push(n.status === "Recebido" ? "#198754" : "#dc3545");
@@ -313,19 +380,23 @@ function renderizar() {
         const tr = document.createElement("tr");
         tr.className = n.status === "Recebido" ? "linha-recebido" : "linha-pendente";
         tr.innerHTML = `
-            <td>${i+1}</td>
+            <td>${i + 1}</td>
             <td><strong>${escapar(n.numero_nota)}</strong></td>
             <td>${dataBR(n.data_emissao)}</td>
             <td class="valor">${moeda(v)}</td>
             <td class="imposto">${moeda(imp)}</td>
-            <td><select class="status ${n.status === "Recebido" ? "status-recebido" : "status-pendente"}" onchange="alterarStatus('${n.id}', this.value)">
-                <option value="Recebido" ${n.status === "Recebido" ? "selected" : ""}>🟢 Recebido</option>
-                <option value="Pendente" ${n.status === "Pendente" ? "selected" : ""}>🔴 Pendente</option>
-            </select></td>
-            <td><div class="acoes">
-                <button class="btn-editar" onclick="editarNota('${n.id}')">✏️</button>
-                <button class="btn-excluir" onclick="abrirExclusao('${n.id}')">🗑️</button>
-            </div></td>
+            <td>
+                <select class="status ${n.status === "Recebido" ? "status-recebido" : "status-pendente"}" data-id="${n.id}">
+                    <option value="Recebido" ${n.status === "Recebido" ? "selected" : ""}>🟢 Recebido</option>
+                    <option value="Pendente" ${n.status === "Pendente" ? "selected" : ""}>🔴 Pendente</option>
+                </select>
+            </td>
+            <td>
+                <div class="acoes">
+                    <button class="btn-editar" data-id="${n.id}">✏️</button>
+                    <button class="btn-excluir" data-id="${n.id}">🗑️</button>
+                </div>
+            </td>
         `;
         tbody.appendChild(tr);
     });
@@ -337,13 +408,14 @@ function renderizar() {
     document.getElementById("card-qtd").textContent = notas.length + (notas.length === 1 ? " nota" : " notas");
     document.getElementById("card-qtd-rec").textContent = qtdRec + (qtdRec === 1 ? " nota" : " notas");
     document.getElementById("card-qtd-pen").textContent = qtdPen + (qtdPen === 1 ? " nota" : " notas");
-    document.getElementById("card-pct").textContent = total > 0 ? ((recebido/total)*100).toFixed(1).replace(".", ",") + "%" : "0%";
+    document.getElementById("card-pct").textContent = total > 0 ? ((recebido / total) * 100).toFixed(1).replace(".", ",") + "%" : "0%";
 
     document.getElementById("tfoot").innerHTML = `
         <tr><td colspan="3" style="text-align:right">TOTAL GERAL</td><td class="valor">${moeda(total)}</td><td class="imposto">${moeda(impTotal)}</td><td colspan="2">${notas.length} notas</td></tr>
         <tr><td colspan="3" style="text-align:right;color:#198754">TOTAL RECEBIDO</td><td class="valor" style="color:#198754">${moeda(recebido)}</td><td></td><td style="color:#198754">${qtdRec} notas</td><td></td></tr>
         <tr><td colspan="3" style="text-align:right;color:#dc3545">TOTAL PENDENTE</td><td class="valor" style="color:#dc3545">${moeda(pendente)}</td><td></td><td style="color:#dc3545">${qtdPen} notas</td><td></td></tr>
     `;
+    
     desenharPie(recebido, pendente);
     desenharBar(labels, valores, cores);
 }
@@ -354,18 +426,40 @@ async function salvarNota() {
     const valor = parseFloat(document.getElementById("in-valor").value);
     const status = document.getElementById("in-status").value;
 
-    if (!numero || !data || !valor || valor <= 0) { alert("Preencha todos os campos."); return; }
+    if (!numero || !data || !valor || valor <= 0) {
+        mostrarErro("Preencha todos os campos.");
+        return;
+    }
 
     if (notaEditando) {
-        await db.from("notas").update({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status }).eq("id", notaEditando);
+        const { error } = await db.from("notas").update({
+            numero_nota: numero,
+            data_emissao: data,
+            valor: valor,
+            imposto_provavel: imposto(valor),
+            status: status
+        }).eq("id", notaEditando);
+        if (error) { mostrarErro("Erro: " + error.message); return; }
+        mostrarSucesso("Atualizada!");
         cancelarEdicao();
         return;
     }
 
-    if (notas.find(n => Number(n.numero_nota) === numero)) { alert("Nota já existe!"); return; }
+    if (notas.find(n => Number(n.numero_nota) === numero)) {
+        mostrarErro("Nota já existe!");
+        return;
+    }
 
-    await db.from("notas").insert({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status });
+    const { error } = await db.from("notas").insert({
+        numero_nota: numero,
+        data_emissao: data,
+        valor: valor,
+        imposto_provavel: imposto(valor),
+        status: status
+    });
+    if (error) { mostrarErro("Erro: " + error.message); return; }
     limparFormulario();
+    mostrarSucesso("Adicionada!");
 }
 
 function editarNota(id) {
@@ -379,6 +473,7 @@ function editarNota(id) {
     document.getElementById("in-status").value = nota.status;
     document.getElementById("btn-salvar").textContent = "SALVAR";
     document.getElementById("btn-cancelar").style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function cancelarEdicao() {
@@ -401,7 +496,10 @@ function abrirExclusao(id) {
     document.getElementById("modalExcluir").style.display = "flex";
 }
 
-function fecharModal() { notaExcluindo = null; document.getElementById("modalExcluir").style.display = "none"; }
+function fecharModal() {
+    notaExcluindo = null;
+    document.getElementById("modalExcluir").style.display = "none";
+}
 
 async function confirmarExclusao() {
     if (!notaExcluindo) return;
@@ -416,6 +514,20 @@ function limparFormulario() {
     document.getElementById("in-status").value = "Pendente";
 }
 
+function mostrarErro(msg) {
+    const el = document.getElementById("msg-erro");
+    el.textContent = msg;
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 3000);
+}
+
+function mostrarSucesso(msg) {
+    const el = document.getElementById("msg-sucesso");
+    el.textContent = msg;
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 3000);
+}
+
 function iniciarRealtime() {
     if (realtimeChannel) db.removeChannel(realtimeChannel);
     realtimeChannel = db.channel("notas-realtime")
@@ -423,7 +535,9 @@ function iniciarRealtime() {
         .subscribe();
 }
 
-function recarregar() { carregarNotas(); }
+// ================================================================
+// GRÁFICOS
+// ================================================================
 
 function desenharPie(recebido, pendente) {
     const canvas = document.getElementById("chartPie");
@@ -431,22 +545,40 @@ function desenharPie(recebido, pendente) {
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
     const total = recebido + pendente;
-    if (!total) { ctx.fillStyle = "#6c757d"; ctx.font = "14px sans-serif"; ctx.textAlign = "center"; ctx.fillText("Sem dados", w/2, h/2); return; }
+    if (!total) {
+        ctx.fillStyle = "#6c757d";
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Sem dados", w/2, h/2);
+        return;
+    }
     const cx = w/2, cy = h/2 - 15, r = Math.min(w,h)/2 - 55;
     let inicio = -Math.PI/2;
-    const fatias = [{ valor: recebido, cor: "#198754", nome: "Recebido" }, { valor: pendente, cor: "#dc3545", nome: "Pendente" }];
+    const fatias = [
+        { valor: recebido, cor: "#198754", nome: "Recebido" },
+        { valor: pendente, cor: "#dc3545", nome: "Pendente" }
+    ];
     fatias.forEach(f => {
         if (f.valor <= 0) return;
-        const angulo = f.valor/total * Math.PI * 2;
-        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, inicio, inicio + angulo); ctx.closePath();
-        ctx.fillStyle = f.cor; ctx.fill();
-        ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.stroke();
+        const angulo = f.valor / total * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, inicio, inicio + angulo);
+        ctx.closePath();
+        ctx.fillStyle = f.cor;
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 3;
+        ctx.stroke();
         inicio += angulo;
     });
     let y = h - 28;
     fatias.forEach(f => {
-        ctx.fillStyle = f.cor; ctx.fillRect(w/2 - 90, y, 12, 12);
-        ctx.fillStyle = "#333"; ctx.font = "11px sans-serif"; ctx.textAlign = "left";
+        ctx.fillStyle = f.cor;
+        ctx.fillRect(w/2 - 90, y, 12, 12);
+        ctx.fillStyle = "#333";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "left";
         ctx.fillText(f.nome + ": " + moeda(f.valor), w/2 - 72, y + 10);
         y += 18;
     });
@@ -463,13 +595,18 @@ function desenharBar(labels, valores, cores) {
     const altura = h - margem.top - margem.bottom;
     const max = Math.max(...valores, 1);
     const espaco = largura / valores.length;
-    const larguraBarra = espaco * .65;
+    const larguraBarra = espaco * 0.65;
 
     for (let i = 0; i <= 5; i++) {
         const y = margem.top + altura - altura * i / 5;
-        ctx.beginPath(); ctx.moveTo(margem.left, y); ctx.lineTo(w - margem.right, y);
-        ctx.strokeStyle = "#dee2e6"; ctx.stroke();
-        ctx.fillStyle = "#6c757d"; ctx.font = "9px sans-serif"; ctx.textAlign = "right";
+        ctx.beginPath();
+        ctx.moveTo(margem.left, y);
+        ctx.lineTo(w - margem.right, y);
+        ctx.strokeStyle = "#dee2e6";
+        ctx.stroke();
+        ctx.fillStyle = "#6c757d";
+        ctx.font = "9px sans-serif";
+        ctx.textAlign = "right";
         ctx.fillText("R$ " + (max * i / 5 / 1000).toFixed(0) + "k", margem.left - 5, y);
     }
 
@@ -477,23 +614,55 @@ function desenharBar(labels, valores, cores) {
         const x = margem.left + i * espaco + (espaco - larguraBarra) / 2;
         const alturaBarra = valor / max * altura;
         const y = margem.top + altura - alturaBarra;
-        ctx.fillStyle = cores[i]; ctx.fillRect(x, y, larguraBarra, alturaBarra);
-        ctx.fillStyle = "#333"; ctx.font = "bold 8px sans-serif"; ctx.textAlign = "center";
+        ctx.fillStyle = cores[i];
+        ctx.fillRect(x, y, larguraBarra, alturaBarra);
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 8px sans-serif";
+        ctx.textAlign = "center";
         ctx.fillText("R$ " + (valor / 1000).toFixed(1) + "k", x + larguraBarra / 2, Math.max(y - 5, 10));
-        ctx.save(); ctx.fillStyle = "#6c757d"; ctx.font = "9px sans-serif";
-        ctx.translate(x + larguraBarra / 2, h - margem.bottom + 12); ctx.rotate(-Math.PI / 4);
-        ctx.fillText(labels[i], 0, 0); ctx.restore();
+        ctx.save();
+        ctx.fillStyle = "#6c757d";
+        ctx.font = "9px sans-serif";
+        ctx.translate(x + larguraBarra / 2, h - margem.bottom + 12);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillText(labels[i], 0, 0);
+        ctx.restore();
     });
 }
 
+// ================================================================
+// EXPORTAÇÕES
+// ================================================================
+
 function exportarCSV() {
     let csv = "Nota,Emissao,Valor,Imposto,Status\n";
-    notas.forEach(n => { csv += n.numero_nota + "," + dataBR(n.data_emissao) + "," + Number(n.valor).toFixed(2).replace(".", ",") + "," + imposto(n.valor).toFixed(2).replace(".", ",") + "," + n.status + "\n"; });
+    notas.forEach(n => {
+        csv += n.numero_nota + "," + dataBR(n.data_emissao) + "," + Number(n.valor).toFixed(2).replace(".", ",") + "," + imposto(n.valor).toFixed(2).replace(".", ",") + "," + n.status + "\n";
+    });
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob); const a = document.createElement("a");
-    a.href = url; a.download = "recebiveis_eta_xerem.csv"; a.click(); URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "recebiveis_eta_xerem.csv";
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function exportarExcel() {
     let html = "<table border='1'><tr><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto</th><th>Status</th></tr>";
-    notas.forEach(n => { html += "<tr><td>" + n.numero_nota + "</td><td>" + dataBR(n.data_emissao) + "</td><td>" + Number(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + imposto(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + n.status + "</td
+    notas.forEach(n => {
+        html += "<tr><td>" + n.numero_nota + "</td><td>" + dataBR(n.data_emissao) + "</td><td>" + Number(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + imposto(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + n.status + "</td></tr>";
+    });
+    html += "</table>";
+    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "recebiveis_eta_xerem.xls";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ================================================================
+// EVENTOS
+// ===============================================================
