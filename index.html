@@ -8,32 +8,18 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; }
-        .container { max-width: 1100px; margin: auto; padding: 16px; }
+        .container { max-width: 1150px; margin: auto; padding: 16px; }
 
-        /* ===== TELA DE LOGIN ===== */
-        #tela-login {
-            position: fixed; inset: 0;
-            background: #1a1a2e;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999; padding: 20px;
-        }
+        /* ===== LOGIN ===== */
+        #tela-login { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
         #tela-login.hidden { display: none; }
-        .login-box {
-            background: white; border-radius: 20px; padding: 40px 30px;
-            max-width: 400px; width: 100%;
-        }
+        .login-box { background: white; border-radius: 20px; padding: 40px 30px; max-width: 400px; width: 100%; }
         .login-box h2 { text-align: center; font-size: 22px; color: #1a1a2e; }
         .login-box .sub { text-align: center; font-size: 13px; color: #666; margin-bottom: 25px; }
         .login-box .form-group { margin-bottom: 16px; }
         .login-box .form-group label { display: block; font-size: 12px; font-weight: bold; color: #333; margin-bottom: 5px; }
-        .login-box .form-group input {
-            width: 100%; padding: 12px 14px;
-            border: 1px solid #ced4da; border-radius: 10px; font-size: 15px;
-        }
-        .login-box .btn-entrar {
-            width: 100%; padding: 13px; background: #0d6efd; color: white;
-            border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;
-        }
+        .login-box .form-group input { width: 100%; padding: 12px 14px; border: 1px solid #ced4da; border-radius: 10px; font-size: 15px; }
+        .login-box .btn-entrar { width: 100%; padding: 13px; background: #0d6efd; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .login-box .btn-entrar:hover { background: #0b5ed7; }
         .login-box .btn-entrar:disabled { opacity: 0.6; }
         .login-box .erro-login { color: #dc3545; font-size: 13px; text-align: center; margin-top: 12px; display: none; }
@@ -49,6 +35,13 @@
         .connection { padding: 5px 10px; border-radius: 20px; font-size: 11px; background: #d4edda; color: #198754; font-weight: bold; }
         .btn-sair { background: #dc3545; color: white; border: none; border-radius: 20px; padding: 5px 16px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-sair:hover { background: #b02a37; }
+
+        .menu-abas { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
+        .menu-abas button { background: #fff; border: 1px solid #dee2e6; border-radius: 20px; padding: 8px 18px; font-size: 13px; cursor: pointer; font-weight: bold; color: #495057; }
+        .menu-abas button.ativa { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+        .secao { display: none; }
+        .secao.ativa { display: block; }
+
         .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
         @media(min-width:700px){ .cards { grid-template-columns: repeat(5, 1fr); } }
         .card { border-radius: 14px; padding: 15px 10px; text-align: center; color: white; }
@@ -60,6 +53,7 @@
         .card-red { background: #dc3545; }
         .card-blue { background: #0d6efd; }
         .card-orange { background: #fd7e14; }
+
         .form-box { background: white; border-radius: 14px; padding: 16px; margin: 16px 0; }
         .form-box h3 { font-size: 14px; margin-bottom: 12px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -70,6 +64,7 @@
         .btn-cancel { background: #6c757d; color: white; border: none; border-radius: 10px; padding: 10px 15px; font-size: 13px; font-weight: bold; cursor: pointer; display: none; width: 100%; }
         .error { color: #dc3545; font-size: 12px; margin-top: 8px; display: none; }
         .success { color: #198754; font-size: 12px; margin-top: 8px; display: none; }
+
         .table-wrap { background: white; border-radius: 14px; overflow-x: auto; margin: 16px 0; }
         table { width: 100%; min-width: 850px; border-collapse: collapse; font-size: 13px; }
         thead { background: #1a1a2e; color: white; }
@@ -87,13 +82,20 @@
         .btn-excluir { background: #dc3545; }
         tfoot { background: #e9ecef; font-weight: bold; }
         tfoot td { padding: 11px; }
+
         .charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 16px 0; }
         @media(min-width:700px){ .charts { grid-template-columns: 1fr 1fr; } }
         .chart-box { background: white; border-radius: 14px; padding: 16px; text-align: center; }
         .chart-box h4 { font-size: 13px; margin-bottom: 10px; }
         canvas { max-width: 100%; height: auto; }
+
         .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 16px 0; }
         .btn-action { background: white; border: 1px solid #dee2e6; border-radius: 10px; padding: 10px 18px; font-size: 13px; cursor: pointer; }
+
+        .busca-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+        .busca-bar input { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 13px; flex: 1; min-width: 160px; }
+        .busca-bar select { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 13px; }
+
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 15px; padding: 20px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
@@ -132,6 +134,18 @@
         <button class="btn-sair" id="btn-sair">🚪 Sair</button>
     </div>
 </header>
+
+<div class="menu-abas">
+    <button class="ativa" data-secao="secao-recebiveis">💵 Recebíveis</button>
+    <button data-secao="secao-dashboard">📊 Fluxo de Caixa</button>
+    <button data-secao="secao-contas">💳 Contas a Pagar</button>
+    <button data-secao="secao-fornecedores">🏢 Fornecedores</button>
+    <button data-secao="secao-produtos">📦 Produtos</button>
+    <button data-secao="secao-relatorio">📈 Relatório</button>
+</div>
+
+<!-- ===== RECEBÍVEIS ===== -->
+<div id="secao-recebiveis" class="secao ativa">
 <div class="cards">
     <div class="card card-dark"><div class="label">Faturamento</div><div class="value" id="card-total">R$ 0,00</div><div class="sub" id="card-qtd">0 notas</div></div>
     <div class="card card-green"><div class="label">Recebido</div><div class="value" id="card-rec">R$ 0,00</div><div class="sub" id="card-qtd-rec">0 notas</div></div>
@@ -154,6 +168,14 @@
     <div class="error" id="msg-erro"></div>
     <div class="success" id="msg-sucesso"></div>
 </div>
+<div class="busca-bar">
+    <input id="busca-notas" placeholder="🔍 Buscar por número da nota...">
+    <select id="filtro-status-notas">
+        <option value="">Todos os status</option>
+        <option value="Recebido">🟢 Recebido</option>
+        <option value="Pendente">🔴 Pendente</option>
+    </select>
+</div>
 <div class="table-wrap">
     <table>
         <thead><tr><th>#</th><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto</th><th>Status</th><th>Ações</th></tr></thead>
@@ -170,7 +192,134 @@
     <button class="btn-action" id="btn-excel">📥 Exportar Excel</button>
     <button class="btn-action" id="btn-recarregar">🔄 Atualizar</button>
 </div>
-<footer>Relatório online — Dados armazenados no Supabase</footer>
+</div>
+
+<!-- ===== FLUXO DE CAIXA ===== -->
+<div id="secao-dashboard" class="secao">
+<div class="cards">
+    <div class="card card-green"><div class="label">A Receber</div><div class="value" id="fx-receber">R$ 0,00</div><div class="sub" id="fx-qtd-receber">0 notas</div></div>
+    <div class="card card-red"><div class="label">A Pagar</div><div class="value" id="fx-pagar">R$ 0,00</div><div class="sub" id="fx-qtd-pagar">0 contas</div></div>
+    <div class="card card-blue"><div class="label">Saldo Previsto</div><div class="value" id="fx-saldo">R$ 0,00</div><div class="sub">Receber − Pagar</div></div>
+    <div class="card card-orange"><div class="label">Vencendo 7 dias</div><div class="value" id="fx-vencendo">0</div><div class="sub">Contas a pagar</div></div>
+</div>
+<div class="table-wrap">
+    <h3 style="padding:12px 16px;font-size:14px;">💳 Boletos a Pagar</h3>
+    <table>
+        <thead><tr><th>Fornecedor</th><th>Nota</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead>
+        <tbody id="tbody-boletos"></tbody>
+    </table>
+</div>
+</div>
+
+<!-- ===== CONTAS A PAGAR ===== -->
+<div id="secao-contas" class="secao">
+<div class="form-box">
+    <h3>📄 Importar Nota Fiscal (XML)</h3>
+    <p style="font-size:12px;color:#6c757d;margin-bottom:12px;">Envie o XML da NF-e. O sistema cadastra automaticamente: fornecedor, conta a pagar, boletos e produtos.</p>
+    <div class="form-grid">
+        <div class="form-group" style="grid-column: span 3;"><label>Arquivo XML (.xml)</label><input type="file" id="in-xml" accept=".xml"></div>
+        <div class="form-group"><button class="btn-add" id="btn-importar-xml">IMPORTAR XML</button></div>
+    </div>
+    <div id="resultado-importacao"></div>
+</div>
+<div class="busca-bar">
+    <input id="busca-contas" placeholder="🔍 Buscar por fornecedor ou nota...">
+    <select id="filtro-status-contas">
+        <option value="">Todos os status</option>
+        <option value="Pendente">🔴 Pendente</option>
+        <option value="Pago">🟢 Pago</option>
+    </select>
+</div>
+<div class="table-wrap">
+    <h3 style="padding:12px 16px;font-size:14px;">💳 Contas a Pagar</h3>
+    <table>
+        <thead><tr><th>Fornecedor</th><th>Nota</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Boletos</th></tr></thead>
+        <tbody id="tbody-contas"></tbody>
+    </table>
+</div>
+</div>
+
+<!-- ===== FORNECEDORES ===== -->
+<div id="secao-fornecedores" class="secao">
+<div class="form-box">
+    <h3 id="titulo-form-fornecedor">🏢 Cadastro de Fornecedor</h3>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>CNPJ</label>
+            <div style="display:flex;gap:6px;">
+                <input id="forn-cnpj" placeholder="00.000.000/0000-00" maxlength="18" style="flex:1;">
+                <button class="btn-action" id="btn-buscar-cnpj" type="button" style="padding:10px 12px;font-size:12px;">🔍 Buscar</button>
+            </div>
+        </div>
+        <div class="form-group"><label>Razão Social *</label><input id="forn-razao" placeholder="Razão social"></div>
+        <div class="form-group"><label>Nome Fantasia</label><input id="forn-fantasia" placeholder="Nome fantasia"></div>
+        <div class="form-group"><label>E-mail</label><input type="email" id="forn-email" placeholder="email@fornecedor.com"></div>
+        <div class="form-group"><label>Telefone</label><input id="forn-telefone" placeholder="(00) 0000-0000"></div>
+        <div class="form-group"><label>Endereço</label><input id="forn-endereco" placeholder="Endereço"></div>
+        <div class="form-group">
+            <button class="btn-add" id="btn-salvar-fornecedor">SALVAR</button>
+            <button class="btn-cancel" id="btn-cancelar-fornecedor">CANCELAR</button>
+        </div>
+    </div>
+    <div class="error" id="msg-erro-fornecedor"></div>
+    <div class="success" id="msg-sucesso-fornecedor"></div>
+</div>
+<div class="busca-bar"><input id="busca-fornecedores" placeholder="🔍 Buscar por razão social ou CNPJ..."></div>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>CNPJ</th><th>Razão Social</th><th>Fantasia</th><th>Contato</th><th>Ações</th></tr></thead>
+        <tbody id="tbody-fornecedores"></tbody>
+    </table>
+</div>
+</div>
+
+<!-- ===== PRODUTOS ===== -->
+<div id="secao-produtos" class="secao">
+<div class="form-box">
+    <h3 id="titulo-form-produto">📦 Cadastro de Produto</h3>
+    <div class="form-grid">
+        <div class="form-group"><label>Descrição *</label><input id="prod-descricao" placeholder="Ex: Cimento CP-II 50kg"></div>
+        <div class="form-group"><label>Unidade</label><input id="prod-unidade" placeholder="Ex: sc, un, kg"></div>
+        <div class="form-group"><label>Valor Unitário (R$)</label><input type="number" step="0.01" id="prod-valor" placeholder="0,00"></div>
+        <div class="form-group">
+            <button class="btn-add" id="btn-salvar-produto">SALVAR</button>
+            <button class="btn-cancel" id="btn-cancelar-produto">CANCELAR</button>
+        </div>
+    </div>
+    <div class="error" id="msg-erro-produto"></div>
+    <div class="success" id="msg-sucesso-produto"></div>
+</div>
+<div class="busca-bar"><input id="busca-produtos" placeholder="🔍 Buscar por descrição..."></div>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>Descrição</th><th>Unidade</th><th>Valor Unitário</th><th>Ações</th></tr></thead>
+        <tbody id="tbody-produtos"></tbody>
+    </table>
+</div>
+</div>
+
+<!-- ===== RELATÓRIO ===== -->
+<div id="secao-relatorio" class="secao">
+<div class="table-wrap">
+    <h3 style="padding:12px 16px;font-size:14px;">📈 Relatório Mensal (Recebido × Pago × Saldo)</h3>
+    <div class="busca-bar">
+        <button class="btn-action" id="btn-exportar-relatorio-csv">📄 Exportar CSV</button>
+        <button class="btn-action" id="btn-exportar-relatorio-excel">📥 Exportar Excel</button>
+    </div>
+    <table>
+        <thead><tr><th>Mês/Ano</th><th>💰 Recebido</th><th>💳 Pago</th><th>📊 Saldo do mês</th></tr></thead>
+        <tbody id="tbody-relatorio"></tbody>
+    </table>
+</div>
+<div class="table-wrap" style="margin-top:16px;">
+    <h3 style="padding:12px 16px;font-size:14px;">🏢 Resumo de Dívidas por Fornecedor</h3>
+    <table>
+        <thead><tr><th>Fornecedor</th><th>CNPJ</th><th>🔴 Em aberto</th><th>🟢 Pago</th><th>Total</th></tr></thead>
+        <tbody id="tbody-resumo-fornecedores"></tbody>
+    </table>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -203,6 +352,14 @@ let notas = [];
 let notaEditando = null;
 let notaExcluindo = null;
 let realtimeChannel = null;
+let xmlArquivo = null;
+let fornecedorEditando = null;
+let produtoEditando = null;
+let fornecedoresTodos = [];
+let produtosTodos = [];
+let contasTodas = [];
+let boletosPorConta = {};
+let dadosRelatorioMensal = [];
 
 // ================================================================
 // AUTENTICAÇÃO
@@ -211,6 +368,11 @@ function mostrarSistema() {
     document.getElementById('tela-login').classList.add('hidden');
     document.getElementById('sistema').classList.add('visible');
     carregarNotas();
+    carregarContas();
+    carregarFluxoCaixa();
+    carregarFornecedores();
+    carregarProdutos();
+    carregarRelatorio();
     iniciarRealtime();
 }
 
@@ -219,16 +381,11 @@ function mostrarLogin() {
     document.getElementById('tela-login').classList.remove('hidden');
 }
 
-// Restaura a sessão ao carregar a página (resolve o "volta pro login no F5")
 async function verificarSessao() {
     try {
         const { data: { session } } = await db.auth.getSession();
-        if (session) {
-            mostrarSistema();
-        }
-    } catch (err) {
-        console.error('Erro:', err);
-    }
+        if (session) mostrarSistema();
+    } catch (err) { console.error('Erro:', err); }
 }
 
 async function fazerLogin() {
@@ -253,14 +410,12 @@ async function fazerLogin() {
         const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
         btn.disabled = false;
         btn.textContent = 'ENTRAR';
-
         if (error) {
             erro.textContent = '❌ ' + error.message;
             erro.style.display = 'block';
             console.error('Erro:', error);
             return;
         }
-
         if (data && data.session) {
             sucesso.textContent = '✅ Login realizado!';
             sucesso.style.display = 'block';
@@ -285,50 +440,37 @@ async function fazerLogout() {
 // ================================================================
 // UTILIDADES
 // ================================================================
-function moeda(v) {
-    return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-function imposto(v) {
-    return Math.round(Number(v || 0) * IMPOSTO_PERCENTUAL * 100) / 100;
-}
-function dataBR(d) {
-    if (!d) return "";
-    const p = d.split("-");
-    return p[2] + "/" + p[1] + "/" + p[0];
-}
-function escapar(t) {
-    return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-}
+function moeda(v) { return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
+function imposto(v) { return Math.round(Number(v || 0) * IMPOSTO_PERCENTUAL * 100) / 100; }
+function dataBR(d) { if (!d) return ""; const p = String(d).split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+function escapar(t) { return String(t == null ? "" : t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+function limparNumero(v) { return (v || '').replace(/[^\d]/g, ''); }
+function formatarCNPJ(cnpj) { const c = limparNumero(cnpj); if (c.length !== 14) return cnpj; return c.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5'); }
 
 // ================================================================
-// CRUD
+// RECEBÍVEIS (CRUD)
 // ================================================================
 async function carregarNotas() {
     const { data, error } = await db.from("notas").select("*").order("data_emissao", { ascending: true });
-    if (error) {
-        console.error(error);
-        return;
-    }
+    if (error) { console.error(error); return; }
     notas = data || [];
-    renderizar();
+    renderizar(aplicarFiltroNotas());
 }
 
-function renderizar() {
+function renderizar(lista) {
+    const dados = lista || notas;
     const tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
     let total = 0, recebido = 0, pendente = 0, impTotal = 0;
     let qtdRec = 0, qtdPen = 0;
     const labels = [], valores = [], cores = [];
 
-    notas.forEach((n, i) => {
+    dados.forEach((n, i) => {
         const v = Number(n.valor);
         const imp = imposto(v);
-        total += v;
-        impTotal += imp;
-        if (n.status === "Recebido") { recebido += v; qtdRec++; }
-        else { pendente += v; qtdPen++; }
-        labels.push(String(n.numero_nota));
-        valores.push(v);
+        total += v; impTotal += imp;
+        if (n.status === "Recebido") { recebido += v; qtdRec++; } else { pendente += v; qtdPen++; }
+        labels.push(String(n.numero_nota)); valores.push(v);
         cores.push(n.status === "Recebido" ? "#198754" : "#dc3545");
 
         const tr = document.createElement("tr");
@@ -345,12 +487,7 @@ function renderizar() {
                     <option value="Pendente" ${n.status === "Pendente" ? "selected" : ""}>🔴 Pendente</option>
                 </select>
             </td>
-            <td>
-                <div class="acoes">
-                    <button class="btn-editar" data-id="${n.id}">✏️</button>
-                    <button class="btn-excluir" data-id="${n.id}">🗑️</button>
-                </div>
-            </td>
+            <td><div class="acoes"><button class="btn-editar" data-id="${n.id}">✏️</button><button class="btn-excluir" data-id="${n.id}">🗑️</button></div></td>
         `;
         tbody.appendChild(tr);
     });
@@ -359,13 +496,13 @@ function renderizar() {
     document.getElementById("card-rec").textContent = moeda(recebido);
     document.getElementById("card-pen").textContent = moeda(pendente);
     document.getElementById("card-imposto").textContent = moeda(impTotal);
-    document.getElementById("card-qtd").textContent = notas.length + (notas.length === 1 ? " nota" : " notas");
+    document.getElementById("card-qtd").textContent = dados.length + (dados.length === 1 ? " nota" : " notas");
     document.getElementById("card-qtd-rec").textContent = qtdRec + (qtdRec === 1 ? " nota" : " notas");
     document.getElementById("card-qtd-pen").textContent = qtdPen + (qtdPen === 1 ? " nota" : " notas");
     document.getElementById("card-pct").textContent = total > 0 ? ((recebido / total) * 100).toFixed(1).replace(".", ",") + "%" : "0%";
 
     document.getElementById("tfoot").innerHTML = `
-        <tr><td colspan="3" style="text-align:right">TOTAL GERAL</td><td class="valor">${moeda(total)}</td><td class="imposto">${moeda(impTotal)}</td><td colspan="2">${notas.length} notas</td></tr>
+        <tr><td colspan="3" style="text-align:right">TOTAL GERAL</td><td class="valor">${moeda(total)}</td><td class="imposto">${moeda(impTotal)}</td><td colspan="2">${dados.length} notas</td></tr>
         <tr><td colspan="3" style="text-align:right;color:#198754">TOTAL RECEBIDO</td><td class="valor" style="color:#198754">${moeda(recebido)}</td><td></td><td style="color:#198754">${qtdRec} notas</td><td></td></tr>
         <tr><td colspan="3" style="text-align:right;color:#dc3545">TOTAL PENDENTE</td><td class="valor" style="color:#dc3545">${moeda(pendente)}</td><td></td><td style="color:#dc3545">${qtdPen} notas</td><td></td></tr>
     `;
@@ -373,40 +510,33 @@ function renderizar() {
     desenharBar(labels, valores, cores);
 }
 
+function aplicarFiltroNotas() {
+    const texto = (document.getElementById('busca-notas')?.value || '').toLowerCase();
+    const status = document.getElementById('filtro-status-notas')?.value || '';
+    return notas.filter(n => {
+        const okTexto = !texto || String(n.numero_nota || '').toLowerCase().includes(texto);
+        const okStatus = !status || n.status === status;
+        return okTexto && okStatus;
+    });
+}
+
 async function salvarNota() {
     const numero = parseInt(document.getElementById("in-nota").value);
     const data = document.getElementById("in-data").value;
     const valor = parseFloat(document.getElementById("in-valor").value);
     const status = document.getElementById("in-status").value;
-
-    if (!numero || !data || !valor || valor <= 0) {
-        mostrarErro("Preencha todos os campos.");
-        return;
-    }
+    if (!numero || !data || !valor || valor <= 0) { mostrarErro("Preencha todos os campos."); return; }
 
     if (notaEditando) {
-        const { error } = await db.from("notas").update({
-            numero_nota: numero, data_emissao: data, valor: valor,
-            imposto_provavel: imposto(valor), status: status
-        }).eq("id", notaEditando);
+        const { error } = await db.from("notas").update({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status }).eq("id", notaEditando);
         if (error) { mostrarErro("Erro: " + error.message); return; }
-        mostrarSucesso("Atualizada!");
-        cancelarEdicao();
-        return;
+        mostrarSucesso("Atualizada!"); cancelarEdicao(); return;
     }
+    if (notas.find(n => Number(n.numero_nota) === numero)) { mostrarErro("Nota já existe!"); return; }
 
-    if (notas.find(n => Number(n.numero_nota) === numero)) {
-        mostrarErro("Nota já existe!");
-        return;
-    }
-
-    const { error } = await db.from("notas").insert({
-        numero_nota: numero, data_emissao: data, valor: valor,
-        imposto_provavel: imposto(valor), status: status
-    });
+    const { error } = await db.from("notas").insert({ numero_nota: numero, data_emissao: data, valor: valor, imposto_provavel: imposto(valor), status: status });
     if (error) { mostrarErro("Erro: " + error.message); return; }
-    limparFormulario();
-    mostrarSucesso("Adicionada!");
+    limparFormulario(); mostrarSucesso("Adicionada!");
 }
 
 function editarNota(id) {
@@ -431,9 +561,7 @@ function cancelarEdicao() {
     limparFormulario();
 }
 
-async function alterarStatus(id, novoStatus) {
- await db.from("notas").update({ status: novoStatus }).eq("id", id);
-}
+async function alterarStatus(id, novoStatus) { await db.from("notas").update({ status: novoStatus }).eq("id", id); }
 
 function abrirExclusao(id) {
     const nota = notas.find(n => String(n.id) === String(id));
@@ -443,10 +571,7 @@ function abrirExclusao(id) {
     document.getElementById("modalExcluir").style.display = "flex";
 }
 
-function fecharModal() {
-    notaExcluindo = null;
-    document.getElementById("modalExcluir").style.display = "none";
-}
+function fecharModal() { notaExcluindo = null; document.getElementById("modalExcluir").style.display = "none"; }
 
 async function confirmarExclusao() {
     if (!notaExcluindo) return;
@@ -461,19 +586,8 @@ function limparFormulario() {
     document.getElementById("in-status").value = "Pendente";
 }
 
-function mostrarErro(msg) {
-    const el = document.getElementById("msg-erro");
-    el.textContent = msg;
-    el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 3000);
-}
-
-function mostrarSucesso(msg) {
-    const el = document.getElementById("msg-sucesso");
-    el.textContent = msg;
-    el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 3000);
-}
+function mostrarErro(msg) { const el = document.getElementById("msg-erro"); el.textContent = msg; el.style.display = "block"; setTimeout(() => el.style.display = "none", 3000); }
+function mostrarSucesso(msg) { const el = document.getElementById("msg-sucesso"); el.textContent = msg; el.style.display = "block"; setTimeout(() => el.style.display = "none", 3000); }
 
 function iniciarRealtime() {
     if (realtimeChannel) db.removeChannel(realtimeChannel);
@@ -491,42 +605,22 @@ function desenharPie(recebido, pendente) {
     const w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
     const total = recebido + pendente;
-    if (!total) {
-        ctx.fillStyle = "#6c757d";
-        ctx.font = "14px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Sem dados", w/2, h/2);
-        return;
-    }
+    if (!total) { ctx.fillStyle = "#6c757d"; ctx.font = "14px sans-serif"; ctx.textAlign = "center"; ctx.fillText("Sem dados", w/2, h/2); return; }
     const cx = w/2, cy = h/2 - 15, r = Math.min(w,h)/2 - 55;
     let inicio = -Math.PI/2;
-    const fatias = [
-        { valor: recebido, cor: "#198754", nome: "Recebido" },
-        { valor: pendente, cor: "#dc3545", nome: "Pendente" }
-    ];
+    const fatias = [ { valor: recebido, cor: "#198754", nome: "Recebido" }, { valor: pendente, cor: "#dc3545", nome: "Pendente" } ];
     fatias.forEach(f => {
         if (f.valor <= 0) return;
         const angulo = f.valor / total * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, r, inicio, inicio + angulo);
-        ctx.closePath();
-        ctx.fillStyle = f.cor;
-        ctx.fill();
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, inicio, inicio + angulo); ctx.closePath();
+        ctx.fillStyle = f.cor; ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.stroke();
         inicio += angulo;
     });
     let y = h - 28;
     fatias.forEach(f => {
-        ctx.fillStyle = f.cor;
-        ctx.fillRect(w/2 - 90, y, 12, 12);
-        ctx.fillStyle = "#333";
-        ctx.font = "11px sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText(f.nome + ": " + moeda(f.valor), w/2 - 72, y + 10);
-        y += 18;
+        ctx.fillStyle = f.cor; ctx.fillRect(w/2 - 90, y, 12, 12);
+        ctx.fillStyle = "#333"; ctx.font = "11px sans-serif"; ctx.textAlign = "left";
+        ctx.fillText(f.nome + ": " + moeda(f.valor), w/2 - 72, y + 10); y += 18;
     });
 }
 
@@ -544,100 +638,366 @@ function desenharBar(labels, valores, cores) {
     const larguraBarra = espaco * 0.65;
     for (let i = 0; i <= 5; i++) {
         const y = margem.top + altura - altura * i / 5;
-        ctx.beginPath();
-        ctx.moveTo(margem.left, y);
-        ctx.lineTo(w - margem.right, y);
-        ctx.strokeStyle = "#dee2e6";
-        ctx.stroke();
-        ctx.fillStyle = "#6c757d";
-        ctx.font = "9px sans-serif";
-        ctx.textAlign = "right";
+        ctx.beginPath(); ctx.moveTo(margem.left, y); ctx.lineTo(w - margem.right, y);
+        ctx.strokeStyle = "#dee2e6"; ctx.stroke();
+        ctx.fillStyle = "#6c757d"; ctx.font = "9px sans-serif"; ctx.textAlign = "right";
         ctx.fillText("R$ " + (max * i / 5 / 1000).toFixed(0) + "k", margem.left - 5, y);
     }
     valores.forEach((valor, i) => {
         const x = margem.left + i * espaco + (espaco - larguraBarra) / 2;
         const alturaBarra = valor / max * altura;
         const y = margem.top + altura - alturaBarra;
-        ctx.fillStyle = cores[i];
-        ctx.fillRect(x, y, larguraBarra, alturaBarra);
-        ctx.fillStyle = "#333";
-        ctx.font = "bold 8px sans-serif";
-        ctx.textAlign = "center";
+        ctx.fillStyle = cores[i]; ctx.fillRect(x, y, larguraBarra, alturaBarra);
+        ctx.fillStyle = "#333"; ctx.font = "bold 8px sans-serif"; ctx.textAlign = "center";
         ctx.fillText("R$ " + (valor / 1000).toFixed(1) + "k", x + larguraBarra / 2, Math.max(y - 5, 10));
-        ctx.save();
-        ctx.fillStyle = "#6c757d";
-        ctx.font = "9px sans-serif";
-        ctx.translate(x + larguraBarra / 2, h - margem.bottom + 12);
-        ctx.rotate(-Math.PI / 4);
-        ctx.fillText(labels[i], 0, 0);
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = "#6c757d"; ctx.font = "9px sans-serif";
+        ctx.translate(x + larguraBarra / 2, h - margem.bottom + 12); ctx.rotate(-Math.PI / 4);
+        ctx.fillText(labels[i], 0, 0); ctx.restore();
     });
 }
 
 // ================================================================
-// EXPORTAções
+// EXPORTAÇÕES (recebíveis)
 // ================================================================
 function exportarCSV() {
     let csv = "Nota,Emissao,Valor,Imposto,Status\n";
-    notas.forEach(n => {
-        csv += n.numero_nota + "," + dataBR(n.data_emissao) + "," + Number(n.valor).toFixed(2).replace(".", ",") + "," + imposto(n.valor).toFixed(2).replace(".", ",") + "," + n.status + "\n";
-    });
+    notas.forEach(n => { csv += n.numero_nota + "," + dataBR(n.data_emissao) + "," + Number(n.valor).toFixed(2).replace(".", ",") + "," + imposto(n.valor).toFixed(2).replace(".", ",") + "," + n.status + "\n"; });
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recebiveis_eta_xerem.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = "recebiveis_eta_xerem.csv"; a.click(); URL.revokeObjectURL(url);
 }
 
 function exportarExcel() {
     let html = "<table border='1'><tr><th>Nota</th><th>Emissão</th><th>Valor</th><th>Imposto</th><th>Status</th></tr>";
-    notas.forEach(n => {
-        html += "<tr><td>" + n.numero_nota + "</td><td>" + dataBR(n.data_emissao) + "</td><td>" + Number(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + imposto(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + n.status + "</td></tr>";
-    });
+    notas.forEach(n => { html += "<tr><td>" + n.numero_nota + "</td><td>" + dataBR(n.data_emissao) + "</td><td>" + Number(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + imposto(n.valor).toFixed(2).replace(".", ",") + "</td><td>" + n.status + "</td></tr>"; });
     html += "</table>";
     const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recebiveis_eta_xerem.xls";
-    a.click();
-    URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = "recebiveis_eta_xerem.xls"; a.click(); URL.revokeObjectURL(url);
 }
 
 // ================================================================
-// EVENTOS  (esta era a parte que estava vazia e causava o problema)
+// IMPORTAÇÃO DE XML NF-e
 // ================================================================
-document.getElementById('btn-entrar').addEventListener('click', fazerLogin);
-document.getElementById('btn-sair').addEventListener('click', fazerLogout);
-document.getElementById('btn-salvar').addEventListener('click', salvarNota);
-document.getElementById('btn-cancelar').addEventListener('click', cancelarEdicao);
-document.getElementById('btn-recarregar').addEventListener('click', carregarNotas);
-document.getElementById('btn-csv').addEventListener('click', exportarCSV);
-document.getElementById('btn-excel').addEventListener('click', exportarExcel);
+async function importarXML() {
+    const box = document.getElementById('resultado-importacao');
+    box.innerHTML = '';
+    if (!xmlArquivo) { box.innerHTML = '<p class="error" style="display:block">Selecione um arquivo XML primeiro.</p>'; return; }
 
-// Ações da tabela (mudar status, editar, excluir) — delegação de eventos
-document.getElementById('tbody').addEventListener('change', (e) => {
-    if (e.target.classList.contains('status')) {
-        alterarStatus(e.target.dataset.id, e.target.value);
-    }
-});
-document.getElementById('tbody').addEventListener('click', (e) => {
-    if (e.target.classList.contains('btn-editar')) {
-        editarNota(e.target.dataset.id);
-    }
-    if (e.target.classList.contains('btn-excluir')) {
-        abrirExclusao(e.target.dataset.id);
-    }
-});
+    const texto = await xmlArquivo.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(texto, 'text/xml');
+    if (xml.querySelector('parsererror')) { box.innerHTML = '<p class="error" style="display:block">❌ Arquivo XML inválido.</p>'; return; }
 
-// Modal de exclusão
-document.getElementById('btn-cancelar-modal').addEventListener('click', fecharModal);
-document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusao);
+    const infNFe = xml.getElementsByTagName('infNFe')[0];
+    if (!infNFe) { box.innerHTML = '<p class="error" style="display:block">❌ Não encontrei a tag infNFe. Envie um XML de NF-e válido.</p>'; return; }
 
-// 🔑 Ao carregar a página, verifica se já existe sessão ativa e direciona
-verificarSessao();
-</script>
-</body>
-</html>
+    const idAttr = infNFe.getAttribute('Id') || '';
+    const chave = idAttr.replace(/^NFe/, '');
+
+    const { data: existente } = await db.from('xml_importados').select('id').eq('chave_acesso', chave).maybeSingle();
+    if (existente) { box.innerHTML = '<p class="error" style="display:block">⚠️ Esta NF-e já foi importada anteriormente.</p>'; return; }
+
+    const emit = infNFe.getElementsByTagName('emit')[0];
+    const cnpj = limparNumero(emit?.getElementsByTagName('CNPJ')[0]?.textContent);
+    const razao = (emit?.getElementsByTagName('xNome')[0]?.textContent || '').trim();
+    const fantasia = (emit?.getElementsByTagName('xFant')[0]?.textContent || '').trim();
+
+    const ide = infNFe.getElementsByTagName('ide')[0];
+    const numero = (ide?.getElementsByTagName('nNF')[0]?.textContent || '').trim();
+    const dhEmi = (ide?.getElementsByTagName('dhEmi')[0]?.textContent || ide?.getElementsByTagName('dEmi')[0]?.textContent || '').trim();
+    const dataEmissao = dhEmi.substring(0, 10);
+
+    const icms = infNFe.getElementsByTagName('ICMSTot')[0];
+    const valor = parseFloat((icms?.getElementsByTagName('vNF')[0]?.textContent || '0').replace(',', '.')) || 0;
+
+    // Produtos
+    const produtosExtraidos = [];
+    const dets = infNFe.getElementsByTagName('det');
+    for (const det of dets) {
+        const prod = det.getElementsByTagName('prod')[0];
+        if (!prod) continue;
+        const descricao = (prod.getElementsByTagName('xProd')[0]?.textContent || '').trim();
+        const unidade = (prod.getElementsByTagName('uCom')[0]?.textContent || '').trim();
+        const vUnCom = parseFloat((prod.getElementsByTagName('vUnCom')[0]?.textContent || '0').replace(',', '.')) || 0;
+        if (!descricao) continue;
+        produtosExtraidos.push({ descricao: descricao, unidade: unidade, valor_unitario: vUnCom });
+    }
+
+    // Boletos (duplicatas)
+    const duplicatas = [];
+    const dups = infNFe.getElementsByTagName('dup');
+    for (const d of dups) {
+        const venc = (d.getElementsByTagName('dVenc')[0]?.textContent || '').trim();
+        const vdup = parseFloat((d.getElementsByTagName('vDup')[0]?.textContent || '0').replace(',', '.')) || 0;
+        if (venc) duplicatas.push({ vencimento: venc, valor: vdup });
+    }
+    if (duplicatas.length === 0) {
+        const venc = new Date(dataEmissao || Date.now());
+        venc.setDate(venc.getDate() + 30);
+        duplicatas.push({ vencimento: venc.toISOString().substring(0, 10), valor: valor });
+    }
+
+    // Fornecedor
+    let fornecedorId = null;
+    if (cnpj) {
+        const { data: fornecedor } = await db.from('fornecedores').select('id').eq('cnpj', cnpj).maybeSingle();
+        if (fornecedor) { fornecedorId = fornecedor.id; }
+        else {
+            const { data: novo, error: errF } = await db.from('fornecedores').insert({ cnpj: cnpj, razao_social: razao, nome_fantasia: fantasia }).select().single();
+            if (errF) { box.innerHTML = '<p class="error" style="display:block">Erro no fornecedor: ' + errF.message + '</p>'; return; }
+            fornecedorId = novo.id;
+        }
+    }
+
+    // Conta a pagar
+    const dataVenc = duplicatas[0].vencimento || dataEmissao;
+    const { data: conta, error: errC } = await db.from('contas_pagar').insert({
+        fornecedor_id: fornecedorId, numero_nota: numero, chave_acesso: chave,
+        data_emissao: dataEmissao || null, data_vencimento: dataVenc, valor: valor, status: 'Pendente'
+    }).select().single();
+    if (errC) { box.innerHTML = '<p class="error" style="display:block">Erro na conta: ' + errC.message + '</p>'; return; }
+
+    // Boletos
+    for (const b of duplicatas) {
+        await db.from('boletos').insert({ conta_pagar_id: conta.id, vencimento: b.vencimento, valor: b.valor, status: 'Pendente' });
+    }
+
+    // Produtos (sem duplicar)
+    let novosProdutos = 0;
+    if (produtosExtraidos.length > 0) {
+        const { data: existentesProd } = await db.from('produtos').select('descricao');
+        const set = new Set((existentesProd || []).map(p => p.descricao.toLowerCase()));
+        for (const p of produtosExtraidos) {
+            const chaveP = p.descricao.toLowerCase();
+            if (set.has(chaveP)) continue;
+            set.add(chaveP);
+            await db.from('produtos').insert({ descricao: p.descricao, unidade: p.unidade || null, valor_unitario: p.valor_unitario || 0 });
+            novosProdutos++;
+        }
+    }
+
+    // Registro do XML
+    await db.from('xml_importados').insert({ chave_acesso: chave, fornecedor_id: fornecedorId, numero_nota: numero });
+
+    box.innerHTML =
+        '<p class="success" style="display:block">✅ NF-e importada com sucesso!</p>' +
+        '<p style="font-size:13px;margin-top:8px;"><strong>Fornecedor:</strong> ' + (razao || '-') + '<br>' +
+        '<strong>Nota:</strong> ' + numero + ' — ' + moeda(valor) + '<br>' +
+        '<strong>Boletos:</strong> ' + duplicatas.length + ' gerado(s)<br>' +
+        '<strong>Produtos:</strong> ' + novosProdutos + ' novo(s) cadastrado(s)</p>';
+
+    xmlArquivo = null;
+    document.getElementById('in-xml').value = '';
+    carregarContas();
+    carregarProdutos();
+}
+
+// ================================================================
+// CONTAS A PAGAR
+// ================================================================
+async function carregarContas() {
+    const [rContas, rBoletos] = await Promise.all([
+        db.from('contas_pagar').select('*, fornecedores(razao_social)').order('data_vencimento', { ascending: true }),
+        db.from('boletos').select('conta_pagar_id,status')
+    ]);
+    if (rContas.error) { console.error(rContas.error); return; }
+    contasTodas = rContas.data || [];
+    boletosPorConta = {};
+    (rBoletos.data || []).forEach(b => {
+        if (!boletosPorConta[b.conta_pagar_id]) boletosPorConta[b.conta_pagar_id] = [];
+        boletosPorConta[b.conta_pagar_id].push(b);
+    });
+    renderizarContas();
+    carregarResumoFornecedores();
+}
+
+function renderizarContas() {
+    const tbody = document.getElementById('tbody-contas');
+    if (!tbody) return;
+    const texto = (document.getElementById('busca-contas')?.value || '').toLowerCase();
+    const status = document.getElementById('filtro-status-contas')?.value || '';
+    const dados = contasTodas.filter(c => {
+        const okTexto = !texto || ((c.fornecedores?.razao_social || '').toLowerCase().includes(texto)) || String(c.numero_nota || '').toLowerCase().includes(texto);
+        const okStatus = !status || c.status === status;
+        return okTexto && okStatus;
+    });
+    tbody.innerHTML = '';
+    if (dados.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="color:#999;padding:20px;">Nenhuma conta encontrada. Importe um XML ou ajuste os filtros.</td></tr>'; return; }
+    dados.forEach(c => {
+        const boletos = boletosPorConta[c.id] || [];
+        const pendentes = boletos.filter(b => b.status !== 'Pago').length;
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td>' + escapar(c.fornecedores?.razao_social || '-') + '</td>' +
+            '<td><strong>' + escapar(c.numero_nota || '-') + '</strong></td>' +
+            '<td>' + dataBR(c.data_emissao) + '</td>' +
+            '<td>' + dataBR(c.data_vencimento) + '</td>' +
+            '<td class="valor">' + moeda(c.valor) + '</td>' +
+            '<td>' + (c.status === 'Pago' ? '<span style="color:#198754;font-weight:bold;">🟢 Pago</span>' : '<span style="color:#dc3545;font-weight:bold;">🔴 Pendente</span>') + '</td>' +
+            '<td>' + pendentes + ' pendente(s)</td>';
+        tbody.appendChild(tr);
+    });
+}
+
+// ================================================================
+// FLUXO DE CAIXA + BOLETOS
+// ================================================================
+async function carregarFluxoCaixa() {
+    const { data: notasRec } = await db.from('notas').select('valor,status');
+    let aReceber = 0, qtdReceber = 0;
+    (notasRec || []).forEach(n => { if (n.status !== 'Recebido') { aReceber += Number(n.valor) || 0; qtdReceber++; } });
+
+    const { data: contas } = await db.from('contas_pagar').select('*');
+    const { data: boletos } = await db.from('boletos').select('*, contas_pagar(fornecedor_id, numero_nota)');
+    const { data: fornecedores } = await db.from('fornecedores').select('id,razao_social');
+    const fornecMap = {};
+    (fornecedores || []).forEach(f => fornecMap[f.id] = f.razao_social);
+
+    let aPagar = 0, qtdPagar = 0, vencendo7 = 0;
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const daqui7 = new Date(hoje); daqui7.setDate(daqui7.getDate() + 7);
+
+    (contas || []).forEach(c => {
+        if (c.status !== 'Pago') {
+            aPagar += Number(c.valor) || 0; qtdPagar++;
+            const venc = c.data_vencimento ? new Date(c.data_vencimento + 'T00:00:00') : null;
+            if (venc && venc <= daqui7) vencendo7++;
+        }
+    });
+
+    document.getElementById('fx-receber').textContent = moeda(aReceber);
+    document.getElementById('fx-qtd-receber').textContent = qtdReceber + (qtdReceber === 1 ? ' nota' : ' notas');
+    document.getElementById('fx-pagar').textContent = moeda(aPagar);
+    document.getElementById('fx-qtd-pagar').textContent = qtdPagar + (qtdPagar === 1 ? ' conta' : ' contas');
+    document.getElementById('fx-saldo').textContent = moeda(aReceber - aPagar);
+    document.getElementById('fx-vencendo').textContent = vencendo7;
+
+    const tbody = document.getElementById('tbody-boletos');
+    tbody.innerHTML = '';
+    const pendentes = (boletos || []).filter(b => b.status !== 'Pago');
+    if (pendentes.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="color:#999;padding:20px;">Nenhum boleto pendente. 🎉</td></tr>'; return; }
+
+    pendentes.forEach(b => {
+        const conta = b.contas_pagar || {};
+        const fornecedor = fornecMap[conta.fornecedor_id] || '-';
+        const venc = b.vencimento ? new Date(b.vencimento + 'T00:00:00') : null;
+        let classe = '', rotulo = '';
+        if (venc && venc < hoje) { classe = 'color:#dc3545;font-weight:bold;'; rotulo = '🔴 Vencido'; }
+        else if (venc && venc <= daqui7) { classe = 'color:#fd7e14;font-weight:bold;'; rotulo = '🟠 Vence em breve'; }
+        else { classe = 'color:#198754;font-weight:bold;'; rotulo = '🟢 Em dia'; }
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td>' + escapar(fornecedor) + '</td>' +
+            '<td><strong>' + escapar(conta.numero_nota || '-') + '</strong></td>' +
+            '<td>' + dataBR(b.vencimento) + '</td>' +
+            '<td class="valor">' + moeda(b.valor) + '</td>' +
+            '<td style="' + classe + '">' + rotulo + '</td>' +
+            '<td><button class="btn-editar" data-boleto="' + b.id + '" onclick="baixarBoleto(\'' + b.id + '\')">✅ Baixar</button></td>';
+        tbody.appendChild(tr);
+    });
+}
+
+async function baixarBoleto(id) {
+    if (!confirm('Marcar este boleto como PAGO?')) return;
+    await db.from('boletos').update({ status: 'Pago', data_pagamento: new Date().toISOString().substring(0,10) }).eq('id', id);
+    carregarFluxoCaixa();
+    carregarContas();
+}
+
+// ================================================================
+// FORNECEDORES
+// ================================================================
+async function buscarCNPJ() {
+    const cnpj = limparNumero(document.getElementById('forn-cnpj').value);
+    if (cnpj.length !== 14) { mostrarErroFornecedor('CNPJ deve ter 14 dígitos.'); return; }
+    try {
+        const resp = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + cnpj);
+        if (!resp.ok) { mostrarErroFornecedor('CNPJ não encontrado. Preencha manualmente.'); return; }
+        const d = await resp.json();
+        document.getElementById('forn-razao').value = d.razao_social || '';
+        document.getElementById('forn-fantasia').value = d.nome_fantasia || '';
+        document.getElementById('forn-email').value = d.email || '';
+        document.getElementById('forn-telefone').value = (d.ddd ? '(' + d.ddd + ') ' : '') + (d.telefone || '');
+        document.getElementById('forn-endereco').value = [d.logradouro, d.numero, d.bairro, d.municipio, d.uf].filter(Boolean).join(', ');
+    } catch (err) { mostrarErroFornecedor('Erro ao consultar. Preencha manualmente.'); }
+}
+
+async function carregarFornecedores() {
+    const { data, error } = await db.from('fornecedores').select('*').order('razao_social');
+    if (error) { console.error(error); return; }
+    fornecedoresTodos = data || [];
+    renderizarFornecedores();
+}
+
+function renderizarFornecedores() {
+    const tbody = document.getElementById('tbody-fornecedores');
+    if (!tbody) return;
+    const texto = (document.getElementById('busca-fornecedores')?.value || '').toLowerCase();
+    const dados = fornecedoresTodos.filter(f => {
+        if (!texto) return true;
+        return (f.razao_social || '').toLowerCase().includes(texto) || (f.nome_fantasia || '').toLowerCase().includes(texto) || (f.cnpj || '').includes(limparNumero(texto));
+    });
+    tbody.innerHTML = '';
+    if (dados.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="color:#999;padding:20px;">Nenhum fornecedor encontrado.</td></tr>'; return; }
+    dados.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td>' + (f.cnpj ? formatarCNPJ(f.cnpj) : '-') + '</td>' +
+            '<td><strong>' + escapar(f.razao_social) + '</strong></td>' +
+            '<td>' + escapar(f.nome_fantasia || '-') + '</td>' +
+            '<td>' + escapar(f.email || '') + (f.telefone ? '<br>' + escapar(f.telefone) : '') + '</td>' +
+            '<td><div class="acoes"><button class="btn-editar" data-id="' + f.id + '">✏️</button><button class="btn-excluir" data-id="' + f.id + '">🗑️</button></div></td>';
+        tbody.appendChild(tr);
+    });
+}
+
+async function salvarFornecedor() {
+    const cnpj = limparNumero(document.getElementById('forn-cnpj').value);
+    const razao = document.getElementById('forn-razao').value.trim();
+    if (!razao) { mostrarErroFornecedor('Informe a razão social.'); return; }
+    const dados = {
+        cnpj: cnpj || null, razao_social: razao,
+        nome_fantasia: document.getElementById('forn-fantasia').value.trim() || null,
+        email: document.getElementById('forn-email').value.trim() || null,
+        telefone: document.getElementById('forn-telefone').value.trim() || null,
+        endereco: document.getElementById('forn-endereco').value.trim() || null
+    };
+    if (fornecedorEditando) {
+        const { error } = await db.from('fornecedores').update(dados).eq('id', fornecedorEditando);
+        if (error) { mostrarErroFornecedor(error.message); return; }
+        mostrarSucessoFornecedor('Fornecedor atualizado!');
+    } else {
+        const { error } = await db.from('fornecedores').insert(dados);
+        if (error) { mostrarErroFornecedor(error.message.includes('duplicate') ? 'CNPJ já cadastrado.' : error.message); return; }
+        mostrarSucessoFornecedor('Fornecedor cadastrado!');
+    }
+    limparFormFornecedor();
+    carregarFornecedores();
+}
+
+async function editarFornecedor(id) {
+    const { data } = await db.from('fornecedores').select('*').eq('id', id).single();
+    if (!data) return;
+    fornecedorEditando = id;
+    document.getElementById('titulo-form-fornecedor').textContent = '✏️ Editando Fornecedor';
+    document.getElementById('forn-cnpj').value = data.cnpj || '';
+    document.getElementById('forn-razao').value = data.razao_social || '';
+    document.getElementById('forn-fantasia').value = data.nome_fantasia || '';
+    document.getElementById('forn-email').value = data.email || '';
+    document.getElementById('forn-telefone').value = data.telefone || '';
+    document.getElementById('forn-endereco').value = data.endereco || '';
+    document.getElementById('btn-salvar-fornecedor').textContent = 'SALVAR';
+    document.getElementById('btn-cancelar-fornecedor').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function excluirFornecedor(id) {
+    if (!confirm('Excluir este fornecedor?')) return;
+    const { error } = await db.from('fornecedores').delete().eq('id', id);
+    if (error) { mostrarErroFornecedor('Não foi possível excluir: ' + error.message); return; }
+    mostrarSucessoFornecedor('Fornecedor excluído.');
+    carregarFornecedores();
+}
+
+function lim
